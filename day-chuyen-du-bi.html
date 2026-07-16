@@ -555,7 +555,54 @@
     padding:10px 14px; background:var(--bg-deep);
   }
 
-  /* ---------- MARKET SHARE RACE ---------- */
+  /* ---------- RACE ANIMATIONS ---------- */
+  @keyframes shiftUp   { from{transform:translateY(6px);opacity:0} to{transform:translateY(0);opacity:1} }
+  @keyframes shiftDown { from{transform:translateY(-6px);opacity:0} to{transform:translateY(0);opacity:1} }
+  @keyframes flashGreen{ 0%,100%{background:var(--panel)} 50%{background:rgba(111,169,160,0.25)} }
+  @keyframes flashRed  { 0%,100%{background:var(--panel)} 50%{background:rgba(214,87,46,0.25)} }
+  @keyframes slideIn   { from{opacity:0;transform:translateX(-12px)} to{opacity:1;transform:translateX(0)} }
+  @keyframes pulse     { 0%,100%{box-shadow:0 0 0 0 rgba(245,183,0,0.4)} 50%{box-shadow:0 0 0 8px rgba(245,183,0,0)} }
+  @keyframes revealCard{ from{transform:scaleX(0);opacity:0} to{transform:scaleX(1);opacity:1} }
+  @keyframes confettiFall {
+    0%  { transform: translateY(-20px) rotate(0deg); opacity:1; }
+    100%{ transform: translateY(300px) rotate(720deg); opacity:0; }
+  }
+  .race-score-flash-up  { animation: flashGreen 0.6s ease; }
+  .race-score-flash-down{ animation: flashRed   0.6s ease; }
+  .share-fill { transition: width 0.8s cubic-bezier(.2,.9,.3,1); }
+  .race-delta {
+    display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:13px;
+    padding:2px 7px; border-radius:2px; margin-left:8px; font-weight:600;
+  }
+  .race-delta.pos{ background:rgba(111,169,160,0.2); color:var(--teal); }
+  .race-delta.neg{ background:rgba(214,87,46,0.2); color:var(--rust); }
+  .game-choice { transition: border-color 0.15s, background 0.15s, transform 0.1s; }
+  .game-choice:hover { transform: translateX(4px); }
+  .game-choice.selected { border-color:var(--teal); background:rgba(111,169,160,0.10); pointer-events:none; }
+  .game-choice.dimmed  { opacity:0.38; pointer-events:none; }
+  .race-reveal-card {
+    background:var(--bg-deep); border:1px solid var(--line); padding:14px 16px;
+    animation: revealCard 0.35s cubic-bezier(.2,.9,.3,1) both;
+    transform-origin: left center;
+  }
+  .race-round-toast {
+    text-align:center; font-family:'Oswald',sans-serif; font-size:22px;
+    letter-spacing:0.04em; padding:14px; margin-bottom:14px;
+    animation: shiftUp 0.4s ease;
+  }
+  .race-round-toast.win  { color:var(--teal); border:1px solid var(--teal); background:rgba(111,169,160,0.1); }
+  .race-round-toast.lose { color:var(--rust); border:1px solid var(--rust); background:rgba(214,87,46,0.1); }
+  .race-round-toast.tie  { color:var(--yellow); border:1px solid var(--yellow); background:rgba(245,183,0,0.1); }
+  .race-confetti-piece {
+    position:absolute; width:8px; height:8px; border-radius:2px;
+    animation: confettiFall 1.6s ease-in forwards;
+    pointer-events:none;
+  }
+  .race-final-box { position:relative; overflow:hidden; }
+  .race-score-big {
+    font-family:'Oswald',sans-serif; font-size:48px; letter-spacing:0.02em;
+    animation: shiftUp 0.5s ease;
+  }
   .share-labels{display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:13px; margin-bottom:6px;}
   .share-labels .you{color:var(--teal);}
   .share-labels .ai{color:var(--rust);}
@@ -1086,17 +1133,56 @@ async function startRace(){
   renderRaceHeader();
   renderRaceRound();
 }
+function animateCounter(el, from, to, duration=600){
+  const start = performance.now();
+  const update = (now) => {
+    const t = Math.min(1, (now - start) / duration);
+    const ease = 1 - Math.pow(1 - t, 3);
+    el.textContent = Math.round(from + (to - from) * ease);
+    if(t < 1) requestAnimationFrame(update);
+  };
+  requestAnimationFrame(update);
+}
+
+function updateShareBar(prevShare, prevAiShare){
+  const youFill = document.getElementById('shareYou');
+  const aiFill  = document.getElementById('shareAi');
+  const youNum  = document.getElementById('shareNumYou');
+  const aiNum   = document.getElementById('shareNumAi');
+  if(!youFill) return;
+
+  // Animate bars
+  youFill.style.width = raceState.share + '%';
+  aiFill.style.width  = raceState.aiShare + '%';
+
+  // Animate numbers
+  if(youNum) animateCounter(youNum, prevShare, Math.round(raceState.share));
+  if(aiNum)  animateCounter(aiNum,  prevAiShare, Math.round(raceState.aiShare));
+
+  // Flash panel
+  const headerEl = document.getElementById('raceHeaderArea');
+  if(headerEl){
+    headerEl.classList.remove('race-score-flash-up','race-score-flash-down');
+    void headerEl.offsetWidth;
+    headerEl.classList.add(raceState.share > prevShare ? 'race-score-flash-up' : 'race-score-flash-down');
+  }
+}
+
 function shareBarHTML(){
   return `
-    <div class="share-labels"><span class="you">PHƯƠNG ÁN CỦA BẠN — QUÝ ${Math.min(raceState.r+1,5)}/5</span><span class="ai">PHƯƠNG ÁN CỦA ${(raceState.useServer || raceState.geminiKey) ? 'GEMINI' : 'AI'}</span></div>
-    <div class="share-bar-bg">
-      <div class="share-fill you" id="shareYou" style="width:${raceState.share}%;">${Math.round(raceState.share)}%</div>
-      <div class="share-fill ai" id="shareAi" style="width:${raceState.aiShare}%;">${Math.round(raceState.aiShare)}%</div>
+    <div class="share-labels">
+      <span class="you">BẠN</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);">QUÝ ${Math.min(raceState.r+1,5)}/5 — ĐIỂM TÍN NHIỆM</span>
+      <span class="ai">${(raceState.useServer || raceState.geminiKey) ? 'GEMINI' : 'AI'}</span>
     </div>
-    <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); margin-top:6px;">Điểm tín nhiệm của xưởng dành cho mỗi phương án (không phải thị phần hai công ty khác nhau)</div>
+    <div class="share-bar-bg">
+      <div class="share-fill you" id="shareYou" style="width:${raceState.share}%;"><span id="shareNumYou">${Math.round(raceState.share)}</span>%</div>
+      <div class="share-fill ai"  id="shareAi"  style="width:${raceState.aiShare}%;"><span id="shareNumAi">${Math.round(raceState.aiShare)}</span>%</div>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted); margin-top:6px;">Điểm tín nhiệm xưởng dành cho mỗi ứng viên — tổng luôn = 100</div>
     <div class="sim-readout" style="grid-template-columns:repeat(2,1fr); margin-top:16px;">
-      <div class="sim-metric"><div class="m-label">Chi phí nếu theo bạn</div><div class="m-val" id="raceProfitYou">${Math.round(raceState.profit)}</div></div>
-      <div class="sim-metric"><div class="m-label">Chi phí nếu theo AI</div><div class="m-val" id="raceProfitAi">${Math.round(raceState.aiProfit)}</div></div>
+      <div class="sim-metric"><div class="m-label">Lao động bị ảnh hưởng nếu theo BẠN</div><div class="m-val" id="raceDubiYou" style="color:var(--rust);">${Math.max(0,Math.round(raceState.dubi))}</div></div>
+      <div class="sim-metric"><div class="m-label">Lao động bị ảnh hưởng nếu theo AI</div><div class="m-val" id="raceDubiAi"  style="color:var(--rust);">${Math.max(0,Math.round(raceState.aiDubi))}</div></div>
     </div>
     ${tradeoffLogHTML()}
   `;
@@ -1206,9 +1292,19 @@ async function callAIForRace(){
 }
 
 async function pickRaceStrategy(idx){
-  document.getElementById('raceStageArea').innerHTML = `
-    <div class="battle-thinking" style="margin-top:18px;">AI đang phân tích bối cảnh quý ${raceState.r+1}<span class="battle-dot"></span><span class="battle-dot"></span><span class="battle-dot"></span></div>
-  `;
+  // 1. Highlight lựa chọn của người dùng, dim các nút còn lại
+  document.querySelectorAll('.game-choice').forEach((btn, i) => {
+    btn.classList.add(i === idx ? 'selected' : 'dimmed');
+    btn.disabled = true;
+  });
+
+  // 2. Hiện "AI đang suy nghĩ" ngay bên dưới
+  const thinkEl = document.createElement('div');
+  thinkEl.className = 'battle-thinking';
+  thinkEl.style.marginTop = '16px';
+  thinkEl.innerHTML = `AI đang phân tích bối cảnh quý ${raceState.r+1}<span class="battle-dot"></span><span class="battle-dot"></span><span class="battle-dot"></span>`;
+  document.getElementById('raceStageArea').appendChild(thinkEl);
+
   const q = raceQuarters[raceState.r];
   let aiIdx = 2, aiReason = "";
   try{
@@ -1220,14 +1316,18 @@ async function pickRaceStrategy(idx){
   }
 
   const human = q.strategies[idx];
-  const ai = q.strategies[aiIdx];
+  const ai    = q.strategies[aiIdx];
   const shift = (human.comp - ai.comp) * 0.5;
-  raceState.share = Math.min(95, Math.max(5, raceState.share + shift));
-  raceState.aiShare = 100 - raceState.share;
-  raceState.profit += raceState.share * 1.2 - human.cost;
-  raceState.aiProfit += raceState.aiShare * 1.2 - ai.cost;
-  raceState.dubi += human.laborCut;
-  raceState.aiDubi += ai.laborCut;
+
+  const prevShare   = raceState.share;
+  const prevAiShare = raceState.aiShare;
+
+  raceState.share    = Math.min(95, Math.max(5, raceState.share + shift));
+  raceState.aiShare  = 100 - raceState.share;
+  raceState.profit  += raceState.share * 1.2 - human.cost;
+  raceState.aiProfit+= raceState.aiShare * 1.2 - ai.cost;
+  raceState.dubi    += Math.max(0, human.laborCut);
+  raceState.aiDubi  += Math.max(0, ai.laborCut);
   raceState.log.push({round: raceState.r+1, human, ai, shift});
 
   // Note lý luận KTCT theo từng quý
@@ -1240,17 +1340,44 @@ async function pickRaceStrategy(idx){
   ];
   const theoryNote = theoryNotes[raceState.r] || "";
 
+  // Xác định toast text
+  const roundWon  = shift > 0.5;
+  const roundLost = shift < -0.5;
+  const toastClass = roundWon ? 'win' : roundLost ? 'lose' : 'tie';
+  const toastText  = roundWon
+    ? `▲ +${shift.toFixed(1)} điểm tín nhiệm về phía bạn`
+    : roundLost
+    ? `▼ ${shift.toFixed(1)} điểm tín nhiệm về phía AI`
+    : `━ Hòa quý này — không ai đổi được tín nhiệm`;
+
+  const deltaClass = shift >= 0 ? 'pos' : 'neg';
+  const deltaText  = (shift >= 0 ? '+' : '') + shift.toFixed(1);
+
+  // Cập nhật header với animate
   document.getElementById('raceHeaderArea').innerHTML = shareBarHTML();
+  // Trigger animate sau khi DOM render
+  requestAnimationFrame(()=> updateShareBar(prevShare, prevAiShare));
+
   document.getElementById('raceStageArea').innerHTML = `
-    <div class="battle-round-result" style="margin-top:16px;">
-      <div class="battle-verdict ${shift>=0?'ok':'bad'}"><b>BẠN</b> đề xuất "${human.title}"</div>
-      <div class="battle-verdict ${shift<0?'ok':'bad'}">
-        <div><b>AI</b> đề xuất "${ai.title}"<div class="battle-ai-reason">${aiReason}</div></div>
+    <div class="race-round-toast ${toastClass}" style="margin-top:16px;">${toastText}</div>
+    <div class="battle-round-result">
+      <div class="battle-verdict ${shift>=0?'ok':'bad'}" style="animation:slideIn 0.3s ease;">
+        <b>BẠN</b>
+        <div>
+          <div style="font-weight:600;">${human.title}</div>
+          <div class="battle-ai-reason">${human.desc}</div>
+        </div>
+        ${shift>0 ? `<span class="race-delta pos">${deltaText}</span>` : ''}
       </div>
-      <div class="battle-ai-reason" style="margin-top:8px;">Xưởng nghiêng tín nhiệm thêm ${Math.abs(shift).toFixed(1)} điểm về phía ${shift>=0?'bạn':'AI'} vì phương án đó hiệu quả hơn quý này.</div>
-      <div style="margin-top:12px; padding:10px 14px; border-left:3px solid var(--yellow); background:var(--bg-deep); font-size:12.5px; color:var(--muted);">${theoryNote}</div>
+      <div class="race-reveal-card" style="margin:8px 0; border-color:var(--rust);">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--rust);margin-bottom:6px;letter-spacing:0.08em;">AI ĐỀ XUẤT</div>
+        <div style="font-weight:600;color:var(--text);">${ai.title}</div>
+        <div class="battle-ai-reason" style="margin-top:4px;">${aiReason}</div>
+        ${shift<0 ? `<span class="race-delta neg">${deltaText}</span>` : ''}
+      </div>
+      <div style="padding:10px 14px; border-left:3px solid var(--yellow); background:var(--bg-deep); font-size:12.5px; color:var(--muted); margin-top:4px; animation:slideIn 0.5s ease;">${theoryNote}</div>
     </div>
-    <button class="battle-next" onclick="nextRaceRound()">${raceState.r < 4 ? 'Sang quý tiếp theo →' : 'Xem kết quả cuối →'}</button>
+    <button class="battle-next" style="margin-top:16px;" onclick="nextRaceRound()">${raceState.r < 4 ? 'Sang quý tiếp theo →' : 'Xem kết quả cuối →'}</button>
   `;
 }
 
@@ -1272,22 +1399,26 @@ function renderRaceFinal(){
     ? "Bạn giữ được vị trí lần này. Nhưng đây chỉ là 5 quý, một mẫu nhỏ — mỗi lần AI đề xuất hiệu quả hơn ở trên, đó vẫn là bằng chứng cho thấy công việc ra quyết định không hoàn toàn miễn nhiễm trước AI."
     : "AI đã giành được vị trí cố vấn ra quyết định. Đây chính là điểm mở rộng quan trọng của luận điểm: đội quân thất nghiệp dự bị không chỉ hình thành từ lao động chân tay (như công nhân may ở mục 04), mà có thể mở rộng sang cả lao động trí óc — đúng như ILO cảnh báo nhóm hành chính, hoạch định, ra quyết định là nhóm rủi ro cao trước GenAI.";
   document.getElementById('raceStageArea').innerHTML = `
-    <div class="game-ending" style="border-color:${color}; margin-top:18px;">
+    <div class="game-ending race-final-box" id="raceFinalBox" style="border-color:${color}; margin-top:18px;">
       <div class="g-ending-tag" style="color:${color};">KẾT THÚC · ${tag}</div>
-      <h3 style="font-size:19px;">Điểm tín nhiệm cuối: bạn ${Math.round(raceState.share)} — AI ${Math.round(raceState.aiShare)}</h3>
+      <div class="race-score-big" style="color:${color}; margin:10px 0 4px;">
+        ${Math.round(raceState.share)} <span style="font-size:22px;color:var(--muted);">vs</span> ${Math.round(raceState.aiShare)}
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:16px;">BẠN — AI</div>
       <p>${verdictText}</p>
-      <p>Nếu tính gộp toàn bộ các phương án được đề xuất trong 5 quý (dù của bạn hay của AI): tổng cộng ${Math.round(raceState.dubi + raceState.aiDubi)} lao động lẽ ra sẽ bị ảnh hưởng nếu xưởng lần lượt áp dụng từng phương án đó.</p>
+      <p>Tổng cộng 5 quý, nếu xưởng áp dụng lần lượt từng phương án: <strong style="color:var(--rust);">${Math.max(0,Math.round(raceState.dubi + raceState.aiDubi))} lao động</strong> sẽ bị ảnh hưởng — bất kể ai là người ra quyết định.</p>
       <div class="g-theory">Điểm mấu chốt: bất kể <em>ai</em> ngồi ở vị trí ra quyết định — con người hay AI — những phương án thiên về tự động hóa vẫn tạo ra đội quân thất nghiệp dự bị ở tầng lao động sản xuất. AI ở đây không đóng vai "nhà tư bản" — nó đang cạnh tranh để <strong>thay thế chính vị trí lao động ra quyết định của bạn</strong>, giống hệt cách robot may thay thế lao động chân tay ở mục 04. Cả hai cùng minh chứng một điều: công nghệ đang mở rộng phạm vi thay thế từ lao động chân tay sang cả lao động trí óc.</div>
       <div class="battle-name-row">
         <input type="text" id="racePlayerName" placeholder="Tên của bạn (để lên bảng xếp hạng lớp)" maxlength="30">
-        <button class="game-start" onclick="saveRaceResult()">Lưu vào bảng xếp hạng lớp →</button>
+        <button class="game-start" onclick="saveRaceResult()">Lưu vào bảng xếp hạng →</button>
       </div>
-      <div class="battle-note">Kết quả hiển thị công khai cho mọi người xem trang này.</div>
+      <div class="battle-note">Kết quả lưu trên máy này (localStorage).</div>
       <div class="leaderboard" id="raceLeaderboard"></div>
       <button class="game-start" style="margin-top:16px;" onclick="renderRaceIntro()">Đấu lại</button>
     </div>
   `;
   loadRaceLeaderboard();
+  if(humanWin) spawnConfetti('raceFinalBox');
 }
 
 function saveRaceResult(){
@@ -1334,6 +1465,26 @@ function clearLeaderboard(){
   if(confirm('Xóa toàn bộ bảng xếp hạng?')){
     localStorage.removeItem('race_results');
     loadRaceLeaderboard();
+  }
+}
+function spawnConfetti(containerId){
+  const box = document.getElementById(containerId);
+  if(!box) return;
+  const colors = ['#F5B700','#6FA9A0','#fff','#D6572E','#a8d8b9'];
+  for(let i = 0; i < 38; i++){
+    const el = document.createElement('div');
+    el.className = 'race-confetti-piece';
+    el.style.cssText = `
+      left:${Math.random()*100}%;
+      top:-10px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-delay:${Math.random()*0.8}s;
+      animation-duration:${1.2 + Math.random()*0.8}s;
+      width:${6+Math.random()*6}px;
+      height:${6+Math.random()*6}px;
+    `;
+    box.appendChild(el);
+    setTimeout(()=>el.remove(), 2400);
   }
 }
 renderRaceIntro();
