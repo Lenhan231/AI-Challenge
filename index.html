@@ -1011,19 +1011,19 @@ const raceQuarters = [
     ]
   },
   {
-    context: "Q3 — Chính phủ ban hành chính sách mới: doanh nghiệp tự động hóa được hoàn thuế 20% chi phí đầu tư, nhưng phải cam kết đào tạo lại ít nhất 50% lao động bị thay thế trong 12 tháng. Đồng thời, giá điện tăng 15% làm chi phí vận hành robot tăng theo.",
+    context: "Q3 — Chính phủ ban hành chính sách mới: doanh nghiệp tự động hóa được hoàn thuế 20% chi phí đầu tư, nhưng phải cam kết đào tạo lại ít nhất 50% lao động bị thay thế trong 12 tháng. Đồng thời, giá điện tăng 15% làm chi phí vận hành robot tăng theo. Ba tháng nữa là hết hạn đăng ký chương trình ưu đãi.",
     strategies: [
-      {title:"Tận dụng ưu đãi thuế + cam kết đào tạo đầy đủ", desc:"Lắp robot, nhận hoàn thuế 20%, và thực sự đào tạo lại 50% lao động. Chi phí đào tạo cao nhưng được bù bởi hoàn thuế. Hình ảnh tốt với khách hàng và cơ quan quản lý.", cost:28, laborCut:10, comp:20},
-      {title:"Tận dụng ưu đãi thuế, cam kết đào tạo nhưng thực hiện tối thiểu", desc:"Nhận hoàn thuế, chỉ đào tạo đủ 50% về mặt hình thức (chương trình ngắn, chất lượng thấp). Rủi ro bị kiểm tra, phạt sau này.", cost:32, laborCut:22, comp:28},
-      {title:"Không lắp robot — chờ chính sách rõ hơn", desc:"Giá điện tăng làm ROI robot kém hấp dẫn. Giữ nguyên, tiết kiệm chi phí, nhưng tiếp tục thua kém đối thủ đã tự động hóa.", cost:8, laborCut:0, comp:5},
+      {title:"Tận dụng ưu đãi thuế + đào tạo lại nghiêm túc", desc:"Lắp robot, nhận hoàn thuế 20%, đào tạo thực chất 50% lao động bị thay thế sang vận hành máy và QC. Chi phí đào tạo cao nhưng được bù bởi hoàn thuế, giảm số người vào đội dự bị.", cost:28, laborCut:10, comp:20},
+      {title:"Tự động hóa không tham gia chương trình ưu đãi", desc:"Lắp robot theo kế hoạch riêng, không ràng buộc cam kết đào tạo. Linh hoạt hơn nhưng bỏ lỡ hoàn thuế 20%, chi phí thực tế cao hơn.", cost:40, laborCut:28, comp:26},
+      {title:"Không lắp robot — chờ vòng ưu đãi tiếp theo", desc:"Giá điện tăng làm ROI robot kém hấp dẫn. Giữ nguyên lao động, tiết kiệm chi phí, nhưng tiếp tục thua kém đối thủ đã tự động hóa về giá thành.", cost:8, laborCut:0, comp:5},
     ]
   },
   {
-    context: "Q4 — Xưởng vừa mất 2 kỹ thuật viên giỏi nhất sang đối thủ (lương cao hơn 40%). Hệ thống robot lắp Q2 đang hoạt động 78% công suất vì thiếu người bảo trì. Một startup đề xuất: cho thuê kỹ thuật viên theo giờ (outsource bảo trì), hoặc tuyển thực tập sinh kỹ thuật và đào tạo nội bộ.",
+    context: "Q4 — Đơn hàng giảm 25% do suy thoái kinh tế ngắn hạn. Xưởng đang phải chọn: cắt giảm ca làm việc (giữ toàn bộ lao động nhưng thu nhập giảm), tạm sa thải một phần (trả trợ cấp, giảm biên chế), hay dùng thời gian rảnh để nâng cấp dây chuyền. Đây là thời điểm kiểm tra xem phương án nào vừa giữ được năng lực sản xuất vừa quản lý được đội ngũ lao động.",
     strategies: [
-      {title:"Outsource bảo trì robot cho startup", desc:"Trả phí theo giờ, không cần tuyển dụng dài hạn. Robot đạt 95% công suất ngay. Nhưng phụ thuộc vào bên ngoài — nếu startup tăng giá hoặc phá sản là kẹt.", cost:20, laborCut:0, comp:19},
-      {title:"Tuyển thực tập sinh kỹ thuật, đào tạo nội bộ 6 tháng", desc:"Chi phí thấp hơn, xây dựng năng lực nội bộ bền vững. Nhưng 6 tháng robot chỉ chạy 78% công suất, ảnh hưởng sản lượng.", cost:15, laborCut:-3, comp:12},
-      {title:"Tăng lương kỹ thuật viên hiện tại + tuyển mới mức cao", desc:"Giải quyết gốc rễ bằng cách cạnh tranh lương. Chi phí nhân sự tăng đáng kể nhưng robot về đủ công suất và có người giữ kiến thức nội bộ.", cost:35, laborCut:-2, comp:23},
+      {title:"Giảm giờ làm toàn bộ — chia sẻ khó khăn", desc:"Giữ 100% lao động, giảm xuống 75% giờ làm. Không ai bị sa thải, không ai vào đội dự bị, nhưng thu nhập toàn xưởng giảm và chi phí cố định vẫn cao.", cost:18, laborCut:0, comp:10},
+      {title:"Tạm sa thải 30% lao động thời vụ, giữ lõi", desc:"Giải phóng chi phí nhân sự ngay lập tức. 30% lao động gia nhập đội quân dự bị lưu động — đúng như lý luận Marx về chu kỳ: tư bản hút lao động khi cần, đẩy ra khi thừa.", cost:14, laborCut:30, comp:18},
+      {title:"Dùng thời gian rảnh nâng cấp dây chuyền bán tự động", desc:"Đầu tư cải tiến quy trình, đào tạo chéo lao động. Chi phí vừa, giảm phụ thuộc lao động phổ thông khi đơn hàng phục hồi — nhưng tăng cấu tạo hữu cơ c/v về dài hạn.", cost:25, laborCut:8, comp:22},
     ]
   },
   {
@@ -1230,6 +1230,16 @@ async function pickRaceStrategy(idx){
   raceState.aiDubi += ai.laborCut;
   raceState.log.push({round: raceState.r+1, human, ai, shift});
 
+  // Note lý luận KTCT theo từng quý
+  const theoryNotes = [
+    "Lý luận: Tuyển thêm lao động thời vụ là mở rộng <em>tư bản khả biến (v)</em> tạm thời — điển hình cho cách tư bản sử dụng đội quân dự bị lưu động khi cần, rồi đẩy ra khi hết đơn hàng.",
+    "Lý luận: Đây là minh chứng <em>cấu tạo hữu cơ c/v tăng có chọn lọc</em> — không tự động hóa toàn diện mà chỉ thay thế đúng khâu robot làm tốt hơn người, phản ánh đúng cơ chế cạnh tranh buộc tư bản tìm điểm thay thế lao động hiệu quả nhất.",
+    "Lý luận: Chính sách hoàn thuế là <em>Nhà nước trợ cấp chi phí tăng c/v</em> cho doanh nghiệp — nhưng dù có đào tạo lại hay không, cấu tạo hữu cơ tổng thể của ngành vẫn tăng, đội quân dự bị chỉ thu hẹp tạm thời chứ không mất đi.",
+    "Lý luận: Suy thoái kinh tế ngắn hạn buộc tư bản 'nhả lao động' ra — đây là dạng <em>đội quân dự bị lưu động</em> điển hình: bị hút vào khi sản xuất mở rộng, bị đẩy ra khi cầu giảm. Phương án nâng cấp dây chuyền trong lúc rảnh chính là tăng c/v về dài hạn.",
+    "Lý luận: Dù bạn hay AI đưa ra quyết định — các phương án thiên về tự động hóa đều tạo thêm lao động dự bị. Đây là <em>nghịch lý hợp thành</em>: quyết định tốt cho từng xưởng riêng lẻ cộng lại thành áp lực thất nghiệp cơ cấu cho toàn ngành.",
+  ];
+  const theoryNote = theoryNotes[raceState.r] || "";
+
   document.getElementById('raceHeaderArea').innerHTML = shareBarHTML();
   document.getElementById('raceStageArea').innerHTML = `
     <div class="battle-round-result" style="margin-top:16px;">
@@ -1238,6 +1248,7 @@ async function pickRaceStrategy(idx){
         <div><b>AI</b> đề xuất "${ai.title}"<div class="battle-ai-reason">${aiReason}</div></div>
       </div>
       <div class="battle-ai-reason" style="margin-top:8px;">Xưởng nghiêng tín nhiệm thêm ${Math.abs(shift).toFixed(1)} điểm về phía ${shift>=0?'bạn':'AI'} vì phương án đó hiệu quả hơn quý này.</div>
+      <div style="margin-top:12px; padding:10px 14px; border-left:3px solid var(--yellow); background:var(--bg-deep); font-size:12.5px; color:var(--muted);">${theoryNote}</div>
     </div>
     <button class="battle-next" onclick="nextRaceRound()">${raceState.r < 4 ? 'Sang quý tiếp theo →' : 'Xem kết quả cuối →'}</button>
   `;
