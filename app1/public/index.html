@@ -3,391 +3,378 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>May AI — Trò Chơi Tương Tác</title>
+  <title>May AI — Viết CV</title>
   <style>
-    :root {
-      --bg: #0f172a;
-      --surface: #1e293b;
-      --accent: #3b82f6;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --text: #f1f5f9;
-      --muted: #94a3b8;
-    }
-
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      margin: 0;
-      padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    .container {
-      max-width: 1024px;
-      margin: 0 auto;
+      background: linear-gradient(135deg, #0f172a 0%, #1a2a4a 100%);
+      color: #f1f5f9;
+      min-height: 100vh;
       padding: 20px;
     }
 
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* Header */
     .header {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 40px;
+    }
+
+    .logo {
+      font-size: 48px;
+      margin-bottom: 12px;
     }
 
     .header h1 {
-      font-size: 32px;
-      font-weight: bold;
-      margin: 0 0 8px 0;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #f59e0b 0%, #3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .header p {
-      color: var(--muted);
-      margin: 0;
+      color: #94a3b8;
+      font-size: 14px;
     }
 
+    /* Sections */
     .section {
       display: none;
-      padding: 40px;
-      background: var(--surface);
-      border-radius: 12px;
-      min-height: 400px;
-      animation: fadeIn 0.3s ease;
+      opacity: 0;
+      transition: opacity 0.3s ease;
     }
 
     .section.active {
       display: block;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      opacity: 1;
     }
 
     /* Lobby */
     .lobby {
+      background: rgba(30, 41, 59, 0.6);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 16px;
+      padding: 40px;
       text-align: center;
+    }
+
+    .lobby h2 {
+      font-size: 24px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .lobby p {
+      color: #94a3b8;
+      margin-bottom: 24px;
     }
 
     .lobby-form {
       display: flex;
       gap: 12px;
-      margin-top: 20px;
-      justify-content: center;
+      margin-bottom: 20px;
       flex-wrap: wrap;
+      justify-content: center;
     }
 
     .lobby-form input {
       padding: 12px 16px;
-      font-size: 16px;
-      border: 1px solid var(--muted);
+      background: rgba(15, 23, 42, 0.8);
+      border: 2px solid rgba(59, 130, 246, 0.3);
       border-radius: 8px;
-      background: var(--bg);
-      color: var(--text);
-      min-width: 300px;
+      color: #f1f5f9;
+      font-size: 16px;
+      min-width: 280px;
+      transition: border-color 0.2s;
+    }
+
+    .lobby-form input:focus {
+      outline: none;
+      border-color: #3b82f6;
     }
 
     .lobby-form button {
-      padding: 12px 24px;
-      font-size: 16px;
-      font-weight: bold;
-      background: var(--accent);
-      color: white;
+      padding: 12px 32px;
+      background: linear-gradient(135deg, #f59e0b 0%, #ec8c1f 100%);
       border: none;
       border-radius: 8px;
+      color: white;
+      font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-size: 16px;
     }
 
     .lobby-form button:hover {
-      background: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
     }
 
-    .status {
-      margin-top: 20px;
-      padding: 12px;
-      background: var(--bg);
-      border-radius: 8px;
-      color: var(--muted);
-    }
-
-    /* Writing Section */
-    .writing {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .job-title-box {
-      background: var(--bg);
-      border: 2px solid var(--accent);
-      border-radius: 8px;
-      padding: 20px;
-      text-align: center;
-      font-size: 24px;
-      font-weight: bold;
-      color: var(--accent);
-    }
-
-    .instruction {
-      color: var(--muted);
+    .lobby-status {
+      color: #94a3b8;
       font-size: 14px;
-      margin-bottom: 10px;
+      margin-top: 16px;
     }
 
-    textarea {
-      padding: 16px;
-      font-size: 16px;
-      border: 1px solid var(--muted);
-      border-radius: 8px;
-      background: var(--bg);
-      color: var(--text);
-      font-family: inherit;
-      resize: vertical;
-      min-height: 300px;
+    /* Writing Phase */
+    .writing-container {
+      background: rgba(30, 41, 59, 0.6);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 16px;
+      padding: 40px;
     }
 
-    .submit-btn {
-      padding: 12px 24px;
-      font-size: 16px;
-      font-weight: bold;
-      background: var(--success);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .submit-btn:hover:not(:disabled) {
-      background: #059669;
-    }
-
-    .submit-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* Voting Section */
-    .voting {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .card {
-      background: var(--bg);
-      border: 2px solid var(--accent);
-      border-radius: 12px;
-      padding: 30px;
-      max-width: 700px;
-      width: 100%;
-      min-height: 350px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      animation: slideIn 0.3s ease;
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateX(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    .card-text {
-      flex: 1;
-      font-size: 16px;
-      line-height: 1.8;
-      white-space: pre-wrap;
-      overflow-y: auto;
-      max-height: 500px;
-      padding: 20px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 8px;
-    }
-
-    .card-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-    }
-
-    .btn-hire,
-    .btn-reject {
-      padding: 12px 32px;
-      font-size: 16px;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-      flex: 1;
-    }
-
-    .btn-hire {
-      background: var(--success);
-      color: white;
-    }
-
-    .btn-hire:hover {
-      background: #059669;
-      transform: scale(1.05);
-    }
-
-    .btn-reject {
-      background: var(--danger);
-      color: white;
-    }
-
-    .btn-reject:hover {
-      background: #dc2626;
-      transform: scale(1.05);
-    }
-
-    .voting-waiting {
+    .job-title {
       text-align: center;
-      padding: 60px 20px;
-      color: var(--muted);
+      margin-bottom: 32px;
     }
 
-    .voting-waiting h2 {
-      font-size: 24px;
-      color: var(--text);
-      margin-bottom: 10px;
-    }
-
-    .voting-waiting p {
-      margin: 8px 0;
-    }
-
-    .pulse {
+    .job-title-badge {
       display: inline-block;
-      animation: pulse 2s infinite;
+      background: rgba(245, 158, 11, 0.1);
+      border: 2px solid #f59e0b;
+      border-radius: 12px;
+      padding: 16px 24px;
+      margin-bottom: 16px;
+    }
+
+    .job-title-badge p {
+      font-size: 32px;
+      margin: 0 0 8px 0;
+    }
+
+    .job-title-badge .label {
+      color: #94a3b8;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .job-title-text {
+      font-size: 20px;
+      color: #f1f5f9;
+      margin-top: 8px;
+    }
+
+    .timer-section {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .timer-display {
+      font-size: 64px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+
+    .timer-display.ok {
+      color: #10b981;
+    }
+
+    .timer-display.warning {
+      color: #f59e0b;
+      animation: pulse 1s infinite;
+    }
+
+    .timer-display.danger {
+      color: #ef4444;
+      animation: pulse 0.5s infinite;
     }
 
     @keyframes pulse {
       0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+      50% { opacity: 0.7; }
     }
 
-    .timer {
+    .timer-label {
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    .instruction {
+      background: rgba(59, 130, 246, 0.1);
+      border-left: 4px solid #3b82f6;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      color: #cbd5e1;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    textarea {
+      width: 100%;
+      height: 280px;
+      padding: 16px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 2px solid rgba(59, 130, 246, 0.3);
+      border-radius: 8px;
+      color: #f1f5f9;
+      font-family: inherit;
+      font-size: 14px;
+      resize: vertical;
+      margin-bottom: 20px;
+      transition: border-color 0.2s;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+    }
+
+    textarea:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .submit-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status-message {
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
       text-align: center;
-      font-size: 48px;
-      font-weight: bold;
-      margin: 20px 0;
-      padding: 20px;
-      background: var(--bg);
-      border-radius: 12px;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: 4px;
     }
 
-    .timer.warning {
-      color: var(--warning);
-      animation: pulse 1s infinite;
+    .status-message.success {
+      background: rgba(16, 185, 129, 0.1);
+      color: #10b981;
     }
 
-    .timer.danger {
-      color: var(--danger);
-      animation: pulse 0.5s infinite;
-    }
-
-    .timer.ok {
-      color: var(--success);
+    .status-message.waiting {
+      background: rgba(94, 109, 159, 0.1);
+      color: #94a3b8;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>🧵 May AI</h1>
-      <p>Trò chơi tương tác: Con người vs AI</p>
+      <div class="logo">🧵</div>
+      <h1>May AI</h1>
+      <p>Viết CV cho vị trí "Nhân Viên May" • 3 phút</p>
     </div>
 
-    <!-- Lobby -->
+    <!-- Lobby Section -->
     <div class="section active" id="lobbySection">
-      <h2>Chào mừng!</h2>
-      <p>Nhập MSSV của bạn để bắt đầu:</p>
-      <div class="lobby-form">
-        <input type="text" id="mssvInput" placeholder="MSSV của bạn" maxlength="20">
-        <button onclick="joinGame()">Tham gia</button>
+      <div class="lobby">
+        <h2>Chào bạn! 👋</h2>
+        <p>Nhập MSSV để bắt đầu</p>
+        <div class="lobby-form">
+          <input type="text" id="mssvInput" placeholder="MSSV của bạn" maxlength="20">
+          <button type="button" onclick="joinGame()">Bắt Đầu</button>
+        </div>
+        <div class="lobby-status" id="lobbyStatus">Chờ xác nhận...</div>
       </div>
-      <div class="status" id="lobbyStatus">Chờ...</div>
     </div>
 
     <!-- Writing Section -->
     <div class="section" id="writingSection">
-      <div style="text-align: center; margin-bottom: 20px;">
-        <div id="playerDisplay" style="color: var(--muted); font-size: 14px; margin-bottom: 10px;"></div>
-        <div class="job-title-box">
-          📝 Nhân Viên May
+      <div class="writing-container">
+        <div class="job-title">
+          <div class="job-title-badge">
+            <p>📝</p>
+            <span class="label">Vị trí tuyển dụng</span>
+            <p class="job-title-text">Nhân Viên May</p>
+          </div>
         </div>
+
+        <div class="timer-section">
+          <div class="timer-display ok" id="timerDisplay">03:00</div>
+          <div class="timer-label">Thời gian còn lại</div>
+        </div>
+
+        <div class="instruction">
+          ✏️ Viết CV của bạn cho vị trí Nhân Viên May. Hãy viết như một ứng viên thực — đừng quên kỹ năng và kinh nghiệm!
+        </div>
+
+        <textarea id="resumeText" placeholder="Nhập CV của bạn tại đây..." disabled></textarea>
+        <button type="button" class="submit-btn" id="submitBtn" onclick="submitResume()" disabled>Nộp CV</button>
+        <div class="status-message waiting" id="writingStatus"></div>
       </div>
-
-      <div class="timer" id="timerDisplay">02:00</div>
-
-      <div class="instruction">
-        ✏️ Viết CV của bạn cho vị trí Nhân Viên May (bạn có 3 phút để viết như con người thật)
-      </div>
-
-      <textarea id="resumeText" placeholder="Nhập CV của bạn tại đây..."></textarea>
-      <button class="submit-btn" id="submitBtn" onclick="submitResume()">Nộp CV</button>
-      <div class="status" id="writingStatus"></div>
-    </div>
-
-    <!-- Voting Section -->
-    <div class="section" id="votingSection">
-      <div style="text-align: center; margin-bottom: 20px;">
-        <div id="playerDisplay2" style="color: var(--muted); font-size: 14px;"></div>
-        <div class="timer" id="votingTimer">10:00</div>
-      </div>
-      <div id="votingContent"></div>
     </div>
   </div>
 
   <script>
-    // Generate new playerId each session (don't persist in localStorage)
-    // This prevents cross-tab MSSV collision
     let playerId = crypto.randomUUID();
-
     let playerMSSV = sessionStorage.getItem("playerMSSV") || "";
-    let gameState = { phase: "lobby" };
-    let resumeSubmitted = false;
     let hasJoined = !!playerMSSV;
+    let resumeSubmitted = false;
 
     const API_BASE = "/api";
-    const JOB_TITLE = "Nhân Viên May";
-    const WRITING_TIME = 180; // 3 minutes
-    const VOTING_TIME = 600; // 10 minutes
+    const WRITING_TIME = 180;
     let writingTimeLeft = WRITING_TIME;
-    let votingTimeLeft = VOTING_TIME;
     let writingTimerInterval = null;
-    let votingTimerInterval = null;
+
+    function showSection(sectionId) {
+      document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+      document.getElementById(sectionId).classList.add("active");
+    }
+
+    function updateTimer() {
+      const mins = Math.floor(writingTimeLeft / 60);
+      const secs = writingTimeLeft % 60;
+      const display = `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+      document.getElementById("timerDisplay").textContent = display;
+
+      const timer = document.getElementById("timerDisplay");
+      if (writingTimeLeft <= 10) {
+        timer.className = "timer-display danger";
+      } else if (writingTimeLeft <= 30) {
+        timer.className = "timer-display warning";
+      } else {
+        timer.className = "timer-display ok";
+      }
+    }
 
     async function joinGame() {
       const mssvInput = document.getElementById("mssvInput");
       playerMSSV = mssvInput.value.trim();
 
       if (!playerMSSV) {
-        alert("Vui lòng nhập MSSV của bạn");
+        alert("Vui lòng nhập MSSV");
         return;
       }
 
@@ -403,7 +390,7 @@
           hasJoined = true;
           mssvInput.disabled = true;
           document.querySelector(".lobby-form button").disabled = true;
-          document.getElementById("lobbyStatus").textContent = `✅ Đã tham gia. MSSV: ${playerMSSV}`;
+          document.getElementById("lobbyStatus").textContent = `✅ Đã tham gia: ${playerMSSV}`;
           showWriting();
         } else {
           alert("Lỗi tham gia game");
@@ -413,89 +400,32 @@
       }
     }
 
-    function startWritingTimer() {
-      writingTimeLeft = WRITING_TIME;
+    function showWriting() {
+      showSection("writingSection");
       document.getElementById("resumeText").disabled = false;
       document.getElementById("submitBtn").disabled = false;
+      document.getElementById("writingStatus").textContent = "Bạn có 3 phút để viết CV";
+      startWritingTimer();
+    }
+
+    function startWritingTimer() {
+      writingTimeLeft = WRITING_TIME;
+      updateTimer();
 
       if (writingTimerInterval) clearInterval(writingTimerInterval);
 
       writingTimerInterval = setInterval(() => {
         writingTimeLeft--;
-        const mins = Math.floor(writingTimeLeft / 60);
-        const secs = writingTimeLeft % 60;
-        const display = `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-        document.getElementById("timerDisplay").textContent = display;
-
-        const timer = document.getElementById("timerDisplay");
-        if (writingTimeLeft <= 10) {
-          timer.className = "timer danger";
-        } else if (writingTimeLeft <= 30) {
-          timer.className = "timer warning";
-        } else {
-          timer.className = "timer ok";
-        }
+        updateTimer();
 
         if (writingTimeLeft <= 0) {
           clearInterval(writingTimerInterval);
           document.getElementById("resumeText").disabled = true;
           document.getElementById("submitBtn").disabled = true;
-          document.getElementById("writingStatus").textContent = "⏰ Hết giờ! Vui lòng chờ mọi người hoàn thành.";
+          document.getElementById("writingStatus").textContent = "⏰ Hết giờ! Chờ mọi người...";
+          document.getElementById("writingStatus").className = "status-message waiting";
         }
       }, 1000);
-    }
-
-    function stopWritingTimer() {
-      if (writingTimerInterval) {
-        clearInterval(writingTimerInterval);
-        writingTimerInterval = null;
-      }
-    }
-
-    function startVotingTimer() {
-      votingTimeLeft = VOTING_TIME;
-
-      if (votingTimerInterval) clearInterval(votingTimerInterval);
-
-      votingTimerInterval = setInterval(() => {
-        votingTimeLeft--;
-        const mins = Math.floor(votingTimeLeft / 60);
-        const secs = votingTimeLeft % 60;
-        const display = `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-        document.getElementById("votingTimer").textContent = display;
-
-        const timer = document.getElementById("votingTimer");
-        if (votingTimeLeft <= 60) {
-          timer.className = "timer danger";
-        } else if (votingTimeLeft <= 180) {
-          timer.className = "timer warning";
-        } else {
-          timer.className = "timer ok";
-        }
-
-        if (votingTimeLeft <= 0) {
-          clearInterval(votingTimerInterval);
-          document.getElementById("votingContent").innerHTML = `
-            <div class="voting-waiting">
-              <h2>⏰ Hết giờ vote!</h2>
-              <p class="pulse">✅ Cảm ơn bạn đã hoàn thành!</p>
-            </div>
-          `;
-        }
-      }, 1000);
-    }
-
-    function stopVotingTimer() {
-      if (votingTimerInterval) {
-        clearInterval(votingTimerInterval);
-        votingTimerInterval = null;
-      }
-    }
-
-    function showWriting() {
-      document.getElementById("playerDisplay").textContent = `MSSV: ${playerMSSV}`;
-      showSection("writingSection");
-      startWritingTimer();
     }
 
     async function submitResume() {
@@ -508,7 +438,7 @@
 
       if (resumeSubmitted) return;
 
-      stopWritingTimer();
+      clearInterval(writingTimerInterval);
       const btn = document.getElementById("submitBtn");
       btn.disabled = true;
       btn.textContent = "Đang nộp...";
@@ -521,14 +451,11 @@
         });
 
         if (res.ok) {
-          const data = await res.json();
           resumeSubmitted = true;
           btn.textContent = "✅ Đã nộp";
-          document.getElementById("writingStatus").textContent = `Đã nộp CV. Hệ thống sinh ${data.aiCount} phiên bản AI...`;
+          document.getElementById("writingStatus").textContent = "✅ CV của bạn đã được lưu. Hệ thống đang sinh phiên bản AI...";
+          document.getElementById("writingStatus").className = "status-message success";
           document.getElementById("resumeText").disabled = true;
-
-          // Delay slightly before moving to voting
-          setTimeout(showVoting, 1500);
         } else {
           btn.disabled = false;
           btn.textContent = "Nộp CV";
@@ -541,122 +468,8 @@
       }
     }
 
-    function showVoting() {
-      stopWritingTimer();
-      document.getElementById("playerDisplay2").textContent = `MSSV: ${playerMSSV}`;
-      showSection("votingSection");
-      startVotingTimer();
-      loadNextCard();
-    }
-
-    async function loadNextCard() {
-      try {
-        const res = await fetch(`${API_BASE}/vote?playerId=${playerId}`);
-        const data = await res.json();
-
-        // Handle API errors
-        if (!res.ok) {
-          console.error("API error:", data);
-          setTimeout(loadNextCard, 1000); // Retry
-          return;
-        }
-
-        if (data.done) {
-          document.getElementById("votingContent").innerHTML = `
-            <div class="voting-waiting">
-              <h2>✅ Bạn đã xong!</h2>
-              <p class="pulse">⏳ Chờ mọi người hoàn thành vote...</p>
-              <p style="margin-top: 20px; color: var(--muted); font-size: 14px;">
-                Host sẽ chiếu kết quả trên màn hình lớn
-              </p>
-            </div>
-          `;
-          // Poll every 2s to see if new resumes available
-          setTimeout(checkForMoreResumes, 2000);
-          return;
-        }
-
-        if (!data.text || !data.resumeId) {
-          console.error("Invalid response:", data);
-          setTimeout(loadNextCard, 1000); // Retry
-          return;
-        }
-
-        const resumeId = data.resumeId;
-        const cardHtml = `
-          <div class="card">
-            <div class="card-text">${data.text}</div>
-            <div class="card-actions">
-              <button class="btn-hire" onclick="vote('${resumeId}', 'hire')">✅ Nhận</button>
-              <button class="btn-reject" onclick="vote('${resumeId}', 'reject')">❌ Từ chối</button>
-            </div>
-          </div>
-        `;
-        document.getElementById("votingContent").innerHTML = cardHtml;
-      } catch (err) {
-        console.error("Load card error:", err);
-        setTimeout(loadNextCard, 1000); // Retry on error
-      }
-    }
-
-    async function checkForMoreResumes() {
-      try {
-        const res = await fetch(`${API_BASE}/vote?playerId=${playerId}`);
-        const data = await res.json();
-
-        if (!data.done) {
-          loadNextCard();
-        } else {
-          setTimeout(checkForMoreResumes, 2000);
-        }
-      } catch (err) {
-        console.error("Check error:", err);
-      }
-    }
-
-    async function vote(resumeId, decision) {
-      // Disable buttons to prevent double-click
-      const buttons = document.querySelectorAll(".btn-hire, .btn-reject");
-      buttons.forEach(btn => btn.disabled = true);
-
-      try {
-        const res = await fetch(`${API_BASE}/vote`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ playerId, resumeId, decision }),
-        });
-
-        if (res.ok) {
-          await loadNextCard();
-        } else {
-          const errorData = await res.json();
-          console.error("Vote error:", errorData);
-          alert(`Lỗi vote: ${errorData.error || "unknown"}`);
-          // Re-enable buttons on error
-          buttons.forEach(btn => btn.disabled = false);
-        }
-      } catch (err) {
-        console.error("Vote exception:", err);
-        alert(`Lỗi: ${err.message}`);
-        // Re-enable buttons on error
-        buttons.forEach(btn => btn.disabled = false);
-      }
-    }
-
-    function showSection(sectionId) {
-      document.querySelectorAll(".section").forEach((s) => {
-        s.classList.remove("active");
-      });
-      document.getElementById(sectionId).classList.add("active");
-    }
-
-
-    // Initialize
     window.addEventListener("load", () => {
-      if (!hasJoined) {
-        showSection("lobbySection");
-      } else {
-        // Already joined in previous session
+      if (hasJoined) {
         showWriting();
       }
     });

@@ -3,30 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Host — May AI</title>
+  <title>Host Panel — May AI</title>
   <style>
-    :root {
-      --bg: #0f172a;
-      --surface: #1e293b;
-      --accent: #3b82f6;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --text: #f1f5f9;
-      --muted: #94a3b8;
-    }
-
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      margin: 0;
-      padding: 20px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
+      background: linear-gradient(135deg, #0f172a 0%, #1a2a4a 100%);
+      color: #f1f5f9;
+      min-height: 100vh;
+      padding: 20px;
     }
 
     .container {
@@ -34,299 +24,441 @@
       margin: 0 auto;
     }
 
+    /* Header */
     .header {
-      text-align: center;
-      margin-bottom: 30px;
-      padding: 20px;
-      background: var(--surface);
-      border-radius: 12px;
-      border: 2px solid var(--accent);
+      margin-bottom: 32px;
     }
 
     .header h1 {
       font-size: 32px;
-      font-weight: bold;
-      margin: 0 0 8px 0;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #f59e0b 0%, #3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .header p {
-      color: var(--muted);
-      margin: 0;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-
-    .card {
-      background: var(--surface);
-      border-radius: 8px;
-      padding: 20px;
-      border: 1px solid rgba(59, 130, 246, 0.2);
-    }
-
-    .card h3 {
+      color: #94a3b8;
       font-size: 14px;
-      color: var(--muted);
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: rgba(30, 41, 59, 0.6);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.2s;
+    }
+
+    .stat-card:hover {
+      border-color: rgba(59, 130, 246, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .stat-label {
+      color: #94a3b8;
+      font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin: 0 0 12px 0;
+      margin-bottom: 8px;
     }
 
-    .card .value {
-      font-size: 36px;
-      font-weight: bold;
-      color: var(--accent);
-      margin: 0;
+    .stat-value {
+      font-size: 40px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
     }
 
+    /* Results Section */
     .results-section {
-      background: var(--surface);
-      border-radius: 12px;
-      padding: 30px;
-      border: 2px solid var(--accent);
-      margin-bottom: 30px;
+      background: rgba(30, 41, 59, 0.6);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(59, 130, 246, 0.3);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 32px;
     }
 
     .results-title {
-      font-size: 24px;
-      font-weight: bold;
-      margin-bottom: 30px;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 24px;
       text-align: center;
     }
 
-    .comparison {
+    .results-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 30px;
-      margin-bottom: 30px;
+      gap: 32px;
+      margin-bottom: 24px;
     }
 
     @media (max-width: 768px) {
-      .comparison {
+      .results-grid {
         grid-template-columns: 1fr;
       }
     }
 
-    .result-item h2 {
-      font-size: 20px;
-      margin-bottom: 15px;
-      color: var(--text);
+    .result-item h3 {
+      font-size: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .rate-display {
+    .result-item.ai h3 {
+      color: #3b82f6;
+    }
+
+    .result-item.human h3 {
+      color: #f59e0b;
+    }
+
+    .hire-rate {
       font-size: 48px;
-      font-weight: bold;
-      margin-bottom: 10px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 16px;
     }
 
-    .ai .rate-display {
-      color: var(--accent);
+    .result-item.ai .hire-rate {
+      color: #3b82f6;
     }
 
-    .human .rate-display {
-      color: var(--warning);
+    .result-item.human .hire-rate {
+      color: #f59e0b;
     }
 
     .bar-chart {
-      background: rgba(255, 255, 255, 0.1);
-      height: 40px;
-      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      height: 32px;
+      border-radius: 8px;
       overflow: hidden;
       position: relative;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
 
     .bar-fill {
       height: 100%;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-end;
+      padding-right: 12px;
       color: white;
-      font-weight: bold;
+      font-weight: 600;
+      font-size: 12px;
+      transition: width 0.3s ease;
+    }
+
+    .result-item.ai .bar-fill {
+      background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+    }
+
+    .result-item.human .bar-fill {
+      background: linear-gradient(90deg, #f59e0b 0%, #ec8c1f 100%);
+    }
+
+    .vote-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
       font-size: 14px;
-      transition: width 0.6s ease;
     }
 
-    .ai .bar-fill {
-      background: linear-gradient(90deg, var(--accent), var(--success));
+    .vote-stat {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 12px;
+      border-radius: 6px;
+      text-align: center;
     }
 
-    .human .bar-fill {
-      background: linear-gradient(90deg, var(--warning), var(--danger));
+    .vote-stat .label {
+      color: #94a3b8;
+      font-size: 12px;
+      margin-bottom: 4px;
     }
 
-    .stats {
-      font-size: 14px;
-      color: var(--muted);
+    .vote-stat .value {
+      font-size: 20px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
     }
 
+    /* Controls */
     .controls {
       display: flex;
       gap: 12px;
-      margin-bottom: 30px;
       flex-wrap: wrap;
+      margin-bottom: 32px;
     }
 
     button {
       padding: 12px 24px;
-      font-size: 16px;
-      font-weight: bold;
       border: none;
       border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
       cursor: pointer;
       transition: all 0.2s;
     }
 
     .btn-primary {
-      background: var(--accent);
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
       color: white;
-      flex: 1;
-      min-width: 200px;
     }
 
     .btn-primary:hover {
-      background: #2563eb;
       transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
     }
 
     .btn-danger {
-      background: var(--danger);
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
       color: white;
-      flex: 1;
-      min-width: 200px;
     }
 
     .btn-danger:hover {
-      background: #dc2626;
       transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
     }
 
-    button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
+    /* CV List Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      overflow-y: auto;
+      padding: 20px;
     }
 
-    .log {
-      background: var(--bg);
-      border: 1px solid var(--muted);
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: rgba(30, 41, 59, 0.95);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 900px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .cv-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .cv-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .cv-item {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(59, 130, 246, 0.2);
       border-radius: 8px;
       padding: 16px;
-      max-height: 200px;
-      overflow-y: auto;
-      font-family: monospace;
+    }
+
+    .cv-item h4 {
+      font-size: 14px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .cv-item.human h4 {
+      color: #f59e0b;
+    }
+
+    .cv-item.ai h4 {
+      color: #3b82f6;
+    }
+
+    .cv-text {
       font-size: 12px;
-      color: var(--muted);
+      color: #cbd5e1;
+      line-height: 1.5;
+      margin-bottom: 12px;
+      max-height: 100px;
+      overflow-y: auto;
     }
 
-    .log-entry {
-      margin: 4px 0;
-      color: var(--text);
+    .cv-vote {
+      display: flex;
+      gap: 8px;
+      font-size: 12px;
+      margin-bottom: 12px;
     }
 
-    .log-entry.success {
-      color: var(--success);
+    .cv-vote span {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 600;
     }
 
-    .log-entry.error {
-      color: var(--danger);
+    .btn-delete {
+      width: 100%;
+      padding: 8px;
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-delete:hover {
+      background: rgba(239, 68, 68, 0.3);
+    }
+
+    .bar-empty {
+      width: 0%;
+    }
+
+    .results-note {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 12px;
+      margin-top: 24px;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>🎮 Host Panel — May AI</h1>
-      <p>Chiếu kết quả trên màn hình chính cho lớp xem</p>
+      <h1>🎮 Host Control Panel</h1>
+      <p>Theo dõi thống kê trực tiếp • Quản lý CV</p>
     </div>
 
     <!-- Stats Grid -->
-    <div class="grid">
-      <div class="card">
-        <h3>👥 Người chơi</h3>
-        <p class="value" id="playerCount">0</p>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">👥 Người chơi</div>
+        <div class="stat-value" id="playerCount">0</div>
       </div>
-      <div class="card">
-        <h3>📄 CV (Human + AI)</h3>
-        <p class="value" id="resumeCount">0</p>
+      <div class="stat-card">
+        <div class="stat-label">📄 CV Tổng (Người + AI)</div>
+        <div class="stat-value" id="resumeCount">0</div>
       </div>
-      <div class="card">
-        <h3>🗳️ Tổng votes</h3>
-        <p class="value" id="voteCount">0</p>
+      <div class="stat-card">
+        <div class="stat-label">🗳️ Tổng Phiếu Bình Chọn</div>
+        <div class="stat-value" id="voteCount">0</div>
       </div>
     </div>
 
     <!-- Results Section -->
     <div class="results-section">
-      <div class="results-title">📊 Kết Quả Thực Thời</div>
+      <div class="results-title">📊 Kết Quả Bình Chọn Thực Thời</div>
 
-      <div class="comparison">
+      <div class="results-grid">
         <!-- AI Results -->
         <div class="result-item ai">
-          <h2>🤖 CV từ AI</h2>
-          <div class="rate-display" id="aiRate">—</div>
+          <h3>🤖 CV từ AI</h3>
+          <div class="hire-rate" id="aiRate">—</div>
           <div class="bar-chart">
-            <div class="bar-fill" id="aiFill" style="width: 0%"></div>
+            <div class="bar-fill bar-empty" id="aiFill"></div>
           </div>
-          <div class="stats">
-            <div>✅ Hire: <span id="aiHire">0</span></div>
-            <div>❌ Reject: <span id="aiReject">0</span></div>
+          <div class="vote-stats">
+            <div class="vote-stat">
+              <div class="label">✅ Nhận</div>
+              <div class="value" id="aiHire">0</div>
+            </div>
+            <div class="vote-stat">
+              <div class="label">❌ Từ chối</div>
+              <div class="value" id="aiReject">0</div>
+            </div>
           </div>
         </div>
 
         <!-- Human Results -->
         <div class="result-item human">
-          <h2>👤 CV từ Người</h2>
-          <div class="rate-display" id="humanRate">—</div>
+          <h3>👤 CV từ Người</h3>
+          <div class="hire-rate" id="humanRate">—</div>
           <div class="bar-chart">
-            <div class="bar-fill" id="humanFill" style="width: 0%"></div>
+            <div class="bar-fill bar-empty" id="humanFill"></div>
           </div>
-          <div class="stats">
-            <div>✅ Hire: <span id="humanHire">0</span></div>
-            <div>❌ Reject: <span id="humanReject">0</span></div>
+          <div class="vote-stats">
+            <div class="vote-stat">
+              <div class="label">✅ Nhận</div>
+              <div class="value" id="humanHire">0</div>
+            </div>
+            <div class="vote-stat">
+              <div class="label">❌ Từ chối</div>
+              <div class="value" id="humanReject">0</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div style="text-align: center; margin-top: 30px;">
-        <p style="color: var(--muted); font-size: 14px;">
-          Trang này cập nhật mỗi 1 giây. Chiếu lên màn hình chính để lớp theo dõi kết quả.
-        </p>
+      <div class="results-note">
+        Cập nhật mỗi 1 giây • Đọc kết quả trực tiếp trên màn hình lớp
       </div>
     </div>
 
     <!-- Controls -->
     <div class="controls">
-      <button class="btn-primary" onclick="showCVList()">📋 Xem CV</button>
-      <button class="btn-primary" onclick="resetStats()">🔄 Reset Stats</button>
-      <button class="btn-danger" onclick="showHelp()">❓ Hướng Dẫn</button>
+      <button type="button" class="btn-primary" onclick="showCVList()">📋 Xem Danh Sách CV</button>
+      <button type="button" class="btn-primary" onclick="resetStats()">🔄 Reset Thống Kê</button>
     </div>
 
     <!-- CV List Modal -->
-    <div id="cvModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; overflow-y: auto; padding: 20px;">
-      <div style="background: var(--surface); max-width: 900px; margin: 20px auto; border-radius: 12px; padding: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <h2 style="margin: 0;">📄 Danh Sách CV</h2>
-          <button onclick="closeCVList()" style="background: var(--danger); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">Đóng</button>
+    <div class="modal" id="cvModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>📄 Danh Sách CV</h2>
+          <button type="button" class="btn-danger" onclick="closeCVList()">Đóng</button>
         </div>
-        <div id="cvContent" style="max-height: 600px; overflow-y: auto;"></div>
+        <div id="cvContent"></div>
       </div>
-    </div>
-
-    <!-- Activity Log -->
-    <div>
-      <h3>Activity Log</h3>
-      <div class="log" id="log"></div>
     </div>
   </div>
 
   <script>
     const API_BASE = "/api";
-
 
     async function loadStats() {
       try {
@@ -343,24 +475,16 @@
         document.getElementById("voteCount").textContent = resultsData.totalVotes;
 
         // AI Results
-        const aiRate =
-          resultsData.aiTotal > 0
-            ? resultsData.aiHireRate.toFixed(1)
-            : "—";
+        const aiRate = resultsData.aiTotal > 0 ? resultsData.aiHireRate.toFixed(1) : "—";
         document.getElementById("aiRate").textContent = `${aiRate}%`;
-        document.getElementById("aiFill").style.width =
-          `${aiRate === "—" ? 0 : aiRate}%`;
+        document.getElementById("aiFill").style.width = `${aiRate === "—" ? 0 : aiRate}%`;
         document.getElementById("aiHire").textContent = resultsData.aiHire;
         document.getElementById("aiReject").textContent = resultsData.aiReject;
 
         // Human Results
-        const humanRate =
-          resultsData.humanTotal > 0
-            ? resultsData.humanHireRate.toFixed(1)
-            : "—";
+        const humanRate = resultsData.humanTotal > 0 ? resultsData.humanHireRate.toFixed(1) : "—";
         document.getElementById("humanRate").textContent = `${humanRate}%`;
-        document.getElementById("humanFill").style.width =
-          `${humanRate === "—" ? 0 : humanRate}%`;
+        document.getElementById("humanFill").style.width = `${humanRate === "—" ? 0 : humanRate}%`;
         document.getElementById("humanHire").textContent = resultsData.humanHire;
         document.getElementById("humanReject").textContent = resultsData.humanReject;
       } catch (err) {
@@ -368,152 +492,104 @@
       }
     }
 
-    function log(message, type = "info") {
-      const logEl = document.getElementById("log");
-      const entry = document.createElement("div");
-      entry.className = `log-entry ${type}`;
-      entry.textContent = `[${new Date().toLocaleTimeString("vi-VN")}] ${message}`;
-      logEl.appendChild(entry);
-      logEl.scrollTop = logEl.scrollHeight;
-
-      if (logEl.children.length > 50) {
-        logEl.removeChild(logEl.firstChild);
-      }
-    }
-
-    async function resetStats() {
-      if (
-        confirm(
-          "Bạn có chắc muốn reset vote counters? (CV sẽ được giữ lại)"
-        )
-      ) {
-        try {
-          const res = await fetch(`${API_BASE}/reset`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-          });
-
-          if (res.ok) {
-            log("✅ Reset vote counters xong", "success");
-            loadStats();
-          } else {
-            log("❌ Reset thất bại", "error");
-          }
-        } catch (err) {
-          log(`❌ ${err.message}`, "error");
-        }
-      }
-    }
-
-    function showHelp() {
-      alert(`🎮 May AI — Hướng Dẫn cho Host
-
-1️⃣ Cho lớp tham gia:
-   - Mỗi người vào: https://day-chuyen-du-bi.vercel.app
-   - Nhập MSSV → Viết CV cho Nhân Viên May
-
-2️⃣ Mở trang này trên máy chiếu:
-   - https://day-chuyen-du-bi.vercel.app/host
-   - Cập nhật realtime mỗi 1 giây
-
-3️⃣ Quá trình:
-   - Tất cả mọi người viết CV cùng lúc
-   - Sau khi submit, hệ thống sinh 1-3 CV AI
-   - Mọi người chuyển sang vote
-   - Vote hoàn thành, kết quả hiển thị ở đây
-
-4️⃣ Kết quả:
-   - So sánh tỉ lệ Hire: AI vs Người
-   - Đưa ra bài học về thay thế lao động
-`);
-    }
-
     async function showCVList() {
-      const modal = document.getElementById("cvModal");
-      const content = document.getElementById("cvContent");
-      content.innerHTML = "<p style='text-align: center; color: var(--muted);'>⏳ Đang tải...</p>";
-      modal.style.display = "block";
-
       try {
-        // Fetch all resumes (consolidated endpoint)
-        const cvData = await fetch(`${API_BASE}/cv`).then(r => r.json()).catch(() => ({ human: [], ai: [] }));
+        const res = await fetch(`${API_BASE}/cv`);
+        const data = await res.json();
 
-        let html = "<div style='display: grid; grid-template-columns: 1fr 1fr; gap: 20px;'>";
+        let html = '<div class="cv-list">';
 
         // Human CVs
-        html += "<div><h3 style='color: var(--warning); margin-top: 0;'>👤 CV Người Viết (" + (cvData.human?.length || 0) + ")</h3>";
-        if (cvData.human && cvData.human.length > 0) {
-          cvData.human.forEach((cv, idx) => {
-            const votes = `✅ ${cv.hireCount} | ❌ ${cv.rejectCount}`;
-            html += `<div style='background: var(--bg); padding: 12px; margin-bottom: 12px; border-radius: 6px; border-left: 3px solid var(--warning); display: flex; justify-content: space-between; align-items: start;'>
-              <div style='flex: 1;'>
-                <strong>${cv.playerName || "Ẩn danh"}</strong>
-                <p style='white-space: pre-wrap; font-size: 13px; color: var(--muted); margin: 8px 0 0 0;'>${cv.text.substring(0, 200)}...</p>
-                <p style='font-size: 12px; color: var(--success); margin: 6px 0 0 0;'>Vote: ${votes}</p>
+        if (data.human && data.human.length > 0) {
+          data.human.forEach((cv, idx) => {
+            html += `
+              <div class="cv-item human">
+                <h4>👤 CV Người #${idx + 1}</h4>
+                <div class="cv-text">${cv.text}</div>
+                <div class="cv-vote">
+                  <span>✅ ${cv.hire || 0}</span>
+                  <span>❌ ${cv.reject || 0}</span>
+                </div>
+                <button type="button" class="btn-delete" onclick="deleteCV('human', '${cv.id}')">🗑️ Xóa</button>
               </div>
-              <button onclick="deleteCV('human', '${cv.playerId}')" style='background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 10px; white-space: nowrap;'>Delete</button>
-            </div>`;
+            `;
           });
-        } else {
-          html += "<p style='color: var(--muted);'>Chưa có CV người nào</p>";
         }
-        html += "</div>";
 
         // AI CVs
-        html += "<div><h3 style='color: var(--accent); margin-top: 0;'>🤖 CV AI (" + (cvData.ai?.length || 0) + ")</h3>";
-        if (cvData.ai && cvData.ai.length > 0) {
-          cvData.ai.forEach((cv, idx) => {
-            const votes = `✅ ${cv.hireCount} | ❌ ${cv.rejectCount}`;
-            html += `<div style='background: var(--bg); padding: 12px; margin-bottom: 12px; border-radius: 6px; border-left: 3px solid var(--accent); display: flex; justify-content: space-between; align-items: start;'>
-              <div style='flex: 1;'>
-                <strong>AI Resume #${idx + 1}</strong>
-                <p style='white-space: pre-wrap; font-size: 13px; color: var(--muted); margin: 8px 0 0 0;'>${cv.text.substring(0, 200)}...</p>
-                <p style='font-size: 12px; color: var(--accent); margin: 6px 0 0 0;'>Vote: ${votes}</p>
+        if (data.ai && data.ai.length > 0) {
+          data.ai.forEach((cv, idx) => {
+            html += `
+              <div class="cv-item ai">
+                <h4>🤖 CV AI #${idx + 1}</h4>
+                <div class="cv-text">${cv.text}</div>
+                <div class="cv-vote">
+                  <span>✅ ${cv.hire || 0}</span>
+                  <span>❌ ${cv.reject || 0}</span>
+                </div>
+                <button type="button" class="btn-delete" onclick="deleteCV('ai', '${cv.id}')">🗑️ Xóa</button>
               </div>
-              <button onclick="deleteCV('ai', '${cv.id}')" style='background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 10px; white-space: nowrap;'>Delete</button>
-            </div>`;
+            `;
           });
-        } else {
-          html += "<p style='color: var(--muted);'>Chưa có CV AI nào</p>";
         }
-        html += "</div></div>";
 
-        content.innerHTML = html;
+        html += '</div>';
+        document.getElementById("cvContent").innerHTML = html;
+        document.getElementById("cvModal").classList.add("active");
       } catch (err) {
-        content.innerHTML = `<p style='color: var(--danger);'>Lỗi load CV: ${err.message}</p>`;
+        console.error("CV list error:", err);
       }
     }
 
     function closeCVList() {
-      document.getElementById("cvModal").style.display = "none";
+      document.getElementById("cvModal").classList.remove("active");
     }
 
     async function deleteCV(type, id) {
-      if (!confirm(`Delete ${type === 'human' ? 'người' : 'AI'} resume?`)) return;
+      if (!confirm("Bạn có chắc chắn muốn xóa CV này?")) return;
 
       try {
-        const res = await fetch(`${API_BASE}/cv/delete`, {
+        const res = await fetch(`${API_BASE}/cv`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ type, id }),
         });
 
         if (res.ok) {
-          log(`✅ Deleted ${type} resume`, "success");
-          showCVList(); // Reload
+          showCVList();
+          loadStats();
         } else {
-          log("❌ Delete failed", "error");
+          alert("Lỗi xóa CV");
         }
       } catch (err) {
-        log(`❌ ${err.message}`, "error");
+        alert(`Lỗi: ${err.message}`);
       }
     }
 
-    // Poll stats every 1 second
+    async function resetStats() {
+      if (!confirm("Bạn có chắc chắn muốn reset tất cả phiếu bình chọn?")) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/reset`, { method: "POST" });
+        if (res.ok) {
+          loadStats();
+        } else {
+          alert("Lỗi reset");
+        }
+      } catch (err) {
+        alert(`Lỗi: ${err.message}`);
+      }
+    }
+
+    // Load stats on page load and every 1 second
     window.addEventListener("load", () => {
       loadStats();
       setInterval(loadStats, 1000);
-      log("✅ Host panel khởi động", "success");
+    });
+
+    // Close modal on escape key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeCVList();
     });
   </script>
 </body>

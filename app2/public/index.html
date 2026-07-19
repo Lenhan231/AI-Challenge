@@ -3,369 +3,383 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>May AI — Trò Chơi Tương Tác</title>
+  <title>May AI — Bình chọn</title>
   <style>
-    :root {
-      --bg: #0f172a;
-      --surface: #1e293b;
-      --accent: #3b82f6;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --text: #f1f5f9;
-      --muted: #94a3b8;
-    }
-
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      margin: 0;
-      padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    .container {
-      max-width: 1024px;
-      margin: 0 auto;
+      background: linear-gradient(135deg, #0f172a 0%, #1a2a4a 100%);
+      color: #f1f5f9;
+      min-height: 100vh;
       padding: 20px;
     }
 
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* Header */
     .header {
       text-align: center;
       margin-bottom: 30px;
     }
 
+    .logo {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
     .header h1 {
-      font-size: 32px;
-      font-weight: bold;
-      margin: 0 0 8px 0;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #f59e0b 0%, #3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .header p {
-      color: var(--muted);
-      margin: 0;
+      color: #94a3b8;
+      font-size: 14px;
     }
 
+    /* Sections */
     .section {
       display: none;
-      padding: 40px;
-      background: var(--surface);
-      border-radius: 12px;
-      min-height: 400px;
-      animation: fadeIn 0.3s ease;
+      opacity: 0;
+      transition: opacity 0.3s ease;
     }
 
     .section.active {
       display: block;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      opacity: 1;
     }
 
     /* Lobby */
     .lobby {
+      background: rgba(30, 41, 59, 0.6);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 16px;
+      padding: 40px;
       text-align: center;
+    }
+
+    .lobby h2 {
+      font-size: 24px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .lobby p {
+      color: #94a3b8;
+      margin-bottom: 24px;
     }
 
     .lobby-form {
       display: flex;
       gap: 12px;
-      margin-top: 20px;
-      justify-content: center;
+      margin-bottom: 20px;
       flex-wrap: wrap;
+      justify-content: center;
     }
 
     .lobby-form input {
       padding: 12px 16px;
-      font-size: 16px;
-      border: 1px solid var(--muted);
+      background: rgba(15, 23, 42, 0.8);
+      border: 2px solid rgba(59, 130, 246, 0.3);
       border-radius: 8px;
-      background: var(--bg);
-      color: var(--text);
-      min-width: 300px;
+      color: #f1f5f9;
+      font-size: 16px;
+      min-width: 280px;
+      transition: border-color 0.2s;
+    }
+
+    .lobby-form input:focus {
+      outline: none;
+      border-color: #3b82f6;
     }
 
     .lobby-form button {
-      padding: 12px 24px;
-      font-size: 16px;
-      font-weight: bold;
-      background: var(--accent);
-      color: white;
+      padding: 12px 32px;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
       border: none;
       border-radius: 8px;
+      color: white;
+      font-weight: 600;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-size: 16px;
     }
 
     .lobby-form button:hover {
-      background: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
     }
 
-    .status {
-      margin-top: 20px;
-      padding: 12px;
-      background: var(--bg);
-      border-radius: 8px;
-      color: var(--muted);
-    }
-
-    /* Writing Section */
-    .writing {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .job-title-box {
-      background: var(--bg);
-      border: 2px solid var(--accent);
-      border-radius: 8px;
-      padding: 20px;
-      text-align: center;
-      font-size: 24px;
-      font-weight: bold;
-      color: var(--accent);
-    }
-
-    .instruction {
-      color: var(--muted);
+    .lobby-status {
+      color: #94a3b8;
       font-size: 14px;
-      margin-bottom: 10px;
+      margin-top: 16px;
     }
 
-    textarea {
-      padding: 16px;
-      font-size: 16px;
-      border: 1px solid var(--muted);
-      border-radius: 8px;
-      background: var(--bg);
-      color: var(--text);
-      font-family: inherit;
-      resize: vertical;
-      min-height: 300px;
-    }
-
-    .submit-btn {
-      padding: 12px 24px;
-      font-size: 16px;
-      font-weight: bold;
-      background: var(--success);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .submit-btn:hover:not(:disabled) {
-      background: #059669;
-    }
-
-    .submit-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* Voting Section */
-    .voting {
+    /* Voting Phase */
+    .voting-wrapper {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
-    }
-
-    .card {
-      background: var(--bg);
-      border: 2px solid var(--accent);
-      border-radius: 12px;
-      padding: 30px;
-      max-width: 700px;
-      width: 100%;
-      min-height: 350px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      animation: slideIn 0.3s ease;
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateX(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    .card-text {
-      flex: 1;
-      font-size: 16px;
-      line-height: 1.8;
-      white-space: pre-wrap;
-      overflow-y: auto;
-      max-height: 500px;
-      padding: 20px;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 8px;
-    }
-
-    .card-actions {
-      display: flex;
-      gap: 12px;
+      min-height: 60vh;
       justify-content: center;
     }
 
-    .btn-hire,
-    .btn-reject {
-      padding: 12px 32px;
-      font-size: 16px;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-      flex: 1;
-    }
-
-    .btn-hire {
-      background: var(--success);
-      color: white;
-    }
-
-    .btn-hire:hover {
-      background: #059669;
-      transform: scale(1.05);
-    }
-
-    .btn-reject {
-      background: var(--danger);
-      color: white;
-    }
-
-    .btn-reject:hover {
-      background: #dc2626;
-      transform: scale(1.05);
-    }
-
-    .voting-waiting {
+    .voting-header {
       text-align: center;
-      padding: 60px 20px;
-      color: var(--muted);
+      margin-bottom: 24px;
+      width: 100%;
     }
 
-    .voting-waiting h2 {
-      font-size: 24px;
-      color: var(--text);
-      margin-bottom: 10px;
-    }
-
-    .voting-waiting p {
-      margin: 8px 0;
-    }
-
-    .pulse {
-      display: inline-block;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+    .voting-header p {
+      color: #94a3b8;
+      font-size: 14px;
+      margin-bottom: 8px;
     }
 
     .timer {
-      text-align: center;
       font-size: 48px;
-      font-weight: bold;
-      margin: 20px 0;
-      padding: 20px;
-      background: var(--bg);
-      border-radius: 12px;
+      font-weight: 700;
       font-variant-numeric: tabular-nums;
-      letter-spacing: 4px;
+      margin-bottom: 8px;
+    }
+
+    .timer.ok {
+      color: #10b981;
     }
 
     .timer.warning {
-      color: var(--warning);
+      color: #f59e0b;
       animation: pulse 1s infinite;
     }
 
     .timer.danger {
-      color: var(--danger);
+      color: #ef4444;
       animation: pulse 0.5s infinite;
     }
 
-    .timer.ok {
-      color: var(--success);
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(0.98); }
+    }
+
+    .progress {
+      display: inline-block;
+      background: rgba(59, 130, 246, 0.1);
+      border: 2px solid #3b82f6;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #3b82f6;
+    }
+
+    /* Resume Card */
+    .card-container {
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .card {
+      background: rgba(30, 41, 59, 0.8);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(59, 130, 246, 0.3);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.2s;
+    }
+
+    .card:hover {
+      border-color: rgba(59, 130, 246, 0.6);
+    }
+
+    .card-text {
+      flex: 1;
+      color: #cbd5e1;
+      line-height: 1.8;
+      font-size: 15px;
+      margin-bottom: 24px;
+      overflow-y: auto;
+      max-height: 200px;
+    }
+
+    .card-text::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .card-text::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .card-text::-webkit-scrollbar-thumb {
+      background: rgba(59, 130, 246, 0.3);
+      border-radius: 3px;
+    }
+
+    .card-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .btn-hire,
+    .btn-reject {
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-hire {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+    }
+
+    .btn-hire:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-reject {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+    }
+
+    .btn-reject:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-hire:disabled,
+    .btn-reject:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Waiting State */
+    .voting-waiting {
+      text-align: center;
+      background: rgba(30, 41, 59, 0.6);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 16px;
+      padding: 60px 40px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .voting-waiting h2 {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    .voting-waiting p {
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+
+    .pulse {
+      animation: pulse 1s infinite;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>🧵 May AI</h1>
-      <p>Trò chơi tương tác: Con người vs AI</p>
+      <div class="logo">🧵</div>
+      <h1>May AI</h1>
+      <p>Bình chọn CV • Con người vs AI</p>
     </div>
 
-    <!-- Lobby -->
+    <!-- Lobby Section -->
     <div class="section active" id="lobbySection">
-      <h2>Chào mừng!</h2>
-      <p>Nhập MSSV của bạn để bắt đầu:</p>
-      <div class="lobby-form">
-        <input type="text" id="mssvInput" placeholder="MSSV của bạn" maxlength="20">
-        <button onclick="joinGame()">Tham gia</button>
+      <div class="lobby">
+        <h2>Chào bạn! 👋</h2>
+        <p>Nhập MSSV để bắt đầu bình chọn</p>
+        <div class="lobby-form">
+          <input type="text" id="mssvInput" placeholder="MSSV của bạn" maxlength="20">
+          <button type="button" onclick="joinGame()">Bắt Đầu</button>
+        </div>
+        <div class="lobby-status" id="lobbyStatus">Chờ xác nhận...</div>
       </div>
-      <div class="status" id="lobbyStatus">Chờ...</div>
     </div>
 
     <!-- Voting Section -->
     <div class="section" id="votingSection">
-      <div style="text-align: center; margin-bottom: 20px;">
-        <div id="playerDisplay" style="color: var(--muted); font-size: 14px;"></div>
-        <div class="timer" id="votingTimer">10:00</div>
-        <div style="color: var(--accent); font-size: 16px; font-weight: bold; margin-top: 12px;">
-          Đã chọn: <span id="voteProgress">0/8</span>
+      <div class="voting-wrapper">
+        <div class="voting-header">
+          <p id="playerDisplay">MSSV: —</p>
+          <div class="timer ok" id="votingTimer">10:00</div>
+          <div class="progress" id="voteProgress">Đã chọn: 0/8</div>
         </div>
+
+        <div class="card-container" id="votingContent"></div>
       </div>
-      <div id="votingContent"></div>
     </div>
   </div>
 
   <script>
-    // Generate new playerId each session (don't persist in localStorage)
-    // This prevents cross-tab MSSV collision
     let playerId = crypto.randomUUID();
-
     let playerMSSV = sessionStorage.getItem("playerMSSV") || "";
-    let gameState = { phase: "lobby" };
     let hasJoined = !!playerMSSV;
 
     const API_BASE = "/api";
-    const VOTING_TIME = 600; // 10 minutes
+    const VOTING_TIME = 600;
     let votingTimeLeft = VOTING_TIME;
     let votingTimerInterval = null;
+
+    function showSection(sectionId) {
+      document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+      document.getElementById(sectionId).classList.add("active");
+    }
+
+    function updateVotingTimer() {
+      const mins = Math.floor(votingTimeLeft / 60);
+      const secs = votingTimeLeft % 60;
+      const display = `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+      document.getElementById("votingTimer").textContent = display;
+
+      const timer = document.getElementById("votingTimer");
+      if (votingTimeLeft <= 60) {
+        timer.className = "timer danger";
+      } else if (votingTimeLeft <= 180) {
+        timer.className = "timer warning";
+      } else {
+        timer.className = "timer ok";
+      }
+    }
 
     async function joinGame() {
       const mssvInput = document.getElementById("mssvInput");
       playerMSSV = mssvInput.value.trim();
 
       if (!playerMSSV) {
-        alert("Vui lòng nhập MSSV của bạn");
+        alert("Vui lòng nhập MSSV");
         return;
       }
 
@@ -381,7 +395,7 @@
           hasJoined = true;
           mssvInput.disabled = true;
           document.querySelector(".lobby-form button").disabled = true;
-          document.getElementById("lobbyStatus").textContent = `✅ Đã tham gia. MSSV: ${playerMSSV}`;
+          document.getElementById("lobbyStatus").textContent = `✅ Đã tham gia: ${playerMSSV}`;
           showVoting();
         } else {
           alert("Lỗi tham gia game");
@@ -391,47 +405,6 @@
       }
     }
 
-    function startVotingTimer() {
-      votingTimeLeft = VOTING_TIME;
-
-      if (votingTimerInterval) clearInterval(votingTimerInterval);
-
-      votingTimerInterval = setInterval(() => {
-        votingTimeLeft--;
-        const mins = Math.floor(votingTimeLeft / 60);
-        const secs = votingTimeLeft % 60;
-        const display = `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-        document.getElementById("votingTimer").textContent = display;
-
-        const timer = document.getElementById("votingTimer");
-        if (votingTimeLeft <= 60) {
-          timer.className = "timer danger";
-        } else if (votingTimeLeft <= 180) {
-          timer.className = "timer warning";
-        } else {
-          timer.className = "timer ok";
-        }
-
-        if (votingTimeLeft <= 0) {
-          clearInterval(votingTimerInterval);
-          document.getElementById("votingContent").innerHTML = `
-            <div class="voting-waiting">
-              <h2>⏰ Hết giờ vote!</h2>
-              <p class="pulse">✅ Cảm ơn bạn đã hoàn thành!</p>
-            </div>
-          `;
-        }
-      }, 1000);
-    }
-
-    function stopVotingTimer() {
-      if (votingTimerInterval) {
-        clearInterval(votingTimerInterval);
-        votingTimerInterval = null;
-      }
-    }
-
-
     function showVoting() {
       document.getElementById("playerDisplay").textContent = `MSSV: ${playerMSSV}`;
       showSection("votingSection");
@@ -439,41 +412,56 @@
       loadNextCard();
     }
 
+    function startVotingTimer() {
+      votingTimeLeft = VOTING_TIME;
+      updateVotingTimer();
+
+      if (votingTimerInterval) clearInterval(votingTimerInterval);
+
+      votingTimerInterval = setInterval(() => {
+        votingTimeLeft--;
+        updateVotingTimer();
+
+        if (votingTimeLeft <= 0) {
+          clearInterval(votingTimerInterval);
+          document.getElementById("votingContent").innerHTML = `
+            <div class="voting-waiting">
+              <h2>⏰ Hết giờ!</h2>
+              <p class="pulse">✅ Cảm ơn bạn đã hoàn thành</p>
+            </div>
+          `;
+        }
+      }, 1000);
+    }
+
     async function loadNextCard() {
       try {
         const res = await fetch(`${API_BASE}/vote?playerId=${playerId}`);
         const data = await res.json();
 
-        // Handle API errors
         if (!res.ok) {
           console.error("API error:", data);
-          setTimeout(loadNextCard, 1000); // Retry
+          setTimeout(loadNextCard, 1000);
           return;
         }
 
-        // Update progress
         if (data.votedCount !== undefined) {
-          document.getElementById("voteProgress").textContent = `${data.votedCount}/${data.total}`;
+          document.getElementById("voteProgress").textContent = `Đã chọn: ${data.votedCount}/${data.total}`;
         }
 
         if (data.done) {
           document.getElementById("votingContent").innerHTML = `
             <div class="voting-waiting">
               <h2>✅ Bạn đã xong!</h2>
-              <p class="pulse">⏳ Chờ mọi người hoàn thành vote...</p>
-              <p style="margin-top: 20px; color: var(--muted); font-size: 14px;">
-                Host sẽ chiếu kết quả trên màn hình lớn
-              </p>
+              <p class="pulse">⏳ Chờ mọi người hoàn thành...</p>
             </div>
           `;
-          // Poll every 2s to see if new resumes available
-          setTimeout(checkForMoreResumes, 2000);
           return;
         }
 
         if (!data.text || !data.resumeId) {
           console.error("Invalid response:", data);
-          setTimeout(loadNextCard, 1000); // Retry
+          setTimeout(loadNextCard, 1000);
           return;
         }
 
@@ -482,35 +470,19 @@
           <div class="card">
             <div class="card-text">${data.text}</div>
             <div class="card-actions">
-              <button class="btn-hire" onclick="vote('${resumeId}', 'hire')">✅ Nhận</button>
-              <button class="btn-reject" onclick="vote('${resumeId}', 'reject')">❌ Từ chối</button>
+              <button type="button" class="btn-hire" onclick="vote('${resumeId}', 'hire')">✅ Nhận</button>
+              <button type="button" class="btn-reject" onclick="vote('${resumeId}', 'reject')">❌ Từ chối</button>
             </div>
           </div>
         `;
         document.getElementById("votingContent").innerHTML = cardHtml;
       } catch (err) {
         console.error("Load card error:", err);
-        setTimeout(loadNextCard, 1000); // Retry on error
-      }
-    }
-
-    async function checkForMoreResumes() {
-      try {
-        const res = await fetch(`${API_BASE}/vote?playerId=${playerId}`);
-        const data = await res.json();
-
-        if (!data.done) {
-          loadNextCard();
-        } else {
-          setTimeout(checkForMoreResumes, 2000);
-        }
-      } catch (err) {
-        console.error("Check error:", err);
+        setTimeout(loadNextCard, 1000);
       }
     }
 
     async function vote(resumeId, decision) {
-      // Disable buttons to prevent double-click
       const buttons = document.querySelectorAll(".btn-hire, .btn-reject");
       buttons.forEach(btn => btn.disabled = true);
 
@@ -527,30 +499,17 @@
           const errorData = await res.json();
           console.error("Vote error:", errorData);
           alert(`Lỗi vote: ${errorData.error || "unknown"}`);
-          // Re-enable buttons on error
           buttons.forEach(btn => btn.disabled = false);
         }
       } catch (err) {
         console.error("Vote exception:", err);
         alert(`Lỗi: ${err.message}`);
-        // Re-enable buttons on error
         buttons.forEach(btn => btn.disabled = false);
       }
     }
 
-    function showSection(sectionId) {
-      document.querySelectorAll(".section").forEach((s) => {
-        s.classList.remove("active");
-      });
-      document.getElementById(sectionId).classList.add("active");
-    }
-
-    // Initialize
     window.addEventListener("load", () => {
-      if (!hasJoined) {
-        showSection("lobbySection");
-      } else {
-        // Already joined in previous session
+      if (hasJoined) {
         showVoting();
       }
     });
