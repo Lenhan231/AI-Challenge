@@ -1,6 +1,22 @@
 const FALLBACK_RESUMES = [
-  `Kinh nghiệm làm việc 3-4 năm tại nhà máy may, thực hiện khâu may áo thun, đồng phục. Thành thạo máy may công nghiệp. Cẩn thận, chịu áp lực tốt, hợp tác hiệu quả với đồng đội.`,
-  `Có 5 năm kinh nghiệm may công sở và đồng phục. Thành thạo máy may Juki, Brother. Kỹ năng cắt may, đo vải chính xác. Tính cách kiên nhẫn, tỉ mỉ, luôn hoàn thành đúng hạn.`,
+  `Kinh nghiệm:
+- Làm việc 3-4 năm tại nhà máy may
+- Khâu may áo thun, đồng phục
+- Thành thạo máy may công nghiệp
+
+Kỹ năng:
+- Cẩn thận, tỉ mỉ trong công việc
+- Chịu áp lực tốt
+- Hợp tác hiệu quả với đồng đội`,
+  `Kinh nghiệm:
+- 5 năm may công sở và đồng phục
+- Thành thạo máy may Juki, Brother
+- Cắt may, đo vải chính xác
+
+Kỹ năng:
+- Kiên nhẫn, tỉ mỉ
+- Luôn hoàn thành đúng hạn
+- Giao tiếp tốt với quản lý`,
   `2 năm làm việc tại xưởng may chuyên may khâu đặc biệt. Thêu tay, cắt vải, may áo công sở. Máy may công nghiệp thành thạo. Chịu áp lực, hợp tác tốt, chú ý chất lượng.`,
   `Kinh nghiệm may áo 4 năm, may quần áo nữ, vest, đồng phục. Kỹ năng đa dạng vải cotton, lụa, vải dệt. Máy may công nghiệp thành thạo. Cẩn thận, giao tiếp tốt.`
 ];
