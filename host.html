@@ -301,8 +301,20 @@
 
     <!-- Controls -->
     <div class="controls">
+      <button class="btn-primary" onclick="showCVList()">📋 Xem CV</button>
       <button class="btn-primary" onclick="resetStats()">🔄 Reset Stats</button>
       <button class="btn-danger" onclick="showHelp()">❓ Hướng Dẫn</button>
+    </div>
+
+    <!-- CV List Modal -->
+    <div id="cvModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; overflow-y: auto; padding: 20px;">
+      <div style="background: var(--surface); max-width: 900px; margin: 20px auto; border-radius: 12px; padding: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2 style="margin: 0;">📄 Danh Sách CV</h2>
+          <button onclick="closeCVList()" style="background: var(--danger); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">Đóng</button>
+        </div>
+        <div id="cvContent" style="max-height: 600px; overflow-y: auto;"></div>
+      </div>
     </div>
 
     <!-- Activity Log -->
@@ -399,6 +411,57 @@
    - So sánh tỉ lệ Hire: AI vs Người
    - Đưa ra bài học về thay thế lao động
 `);
+    }
+
+    async function showCVList() {
+      const modal = document.getElementById("cvModal");
+      const content = document.getElementById("cvContent");
+      content.innerHTML = "<p style='text-align: center; color: var(--muted);'>⏳ Đang tải...</p>";
+      modal.style.display = "block";
+
+      try {
+        // Fetch human resumes
+        const humanKeys = await fetch(`${API_BASE}/cv/human`).then(r => r.json()).catch(() => ({ resumes: [] }));
+        const aiKeys = await fetch(`${API_BASE}/cv/ai`).then(r => r.json()).catch(() => ({ resumes: [] }));
+
+        let html = "<div style='display: grid; grid-template-columns: 1fr 1fr; gap: 20px;'>";
+
+        // Human CVs
+        html += "<div><h3 style='color: var(--warning); margin-top: 0;'>👤 CV Người Viết (" + (humanKeys.resumes?.length || 0) + ")</h3>";
+        if (humanKeys.resumes && humanKeys.resumes.length > 0) {
+          humanKeys.resumes.forEach((cv, idx) => {
+            html += `<div style='background: var(--bg); padding: 12px; margin-bottom: 12px; border-radius: 6px; border-left: 3px solid var(--warning);'>
+              <strong>${cv.playerName || "Ẩn danh"}</strong>
+              <p style='white-space: pre-wrap; font-size: 13px; color: var(--muted); margin: 8px 0 0 0;'>${cv.text.substring(0, 200)}...</p>
+            </div>`;
+          });
+        } else {
+          html += "<p style='color: var(--muted);'>Chưa có CV người nào</p>";
+        }
+        html += "</div>";
+
+        // AI CVs
+        html += "<div><h3 style='color: var(--accent); margin-top: 0;'>🤖 CV AI (" + (aiKeys.resumes?.length || 0) + ")</h3>";
+        if (aiKeys.resumes && aiKeys.resumes.length > 0) {
+          aiKeys.resumes.forEach((cv, idx) => {
+            html += `<div style='background: var(--bg); padding: 12px; margin-bottom: 12px; border-radius: 6px; border-left: 3px solid var(--accent);'>
+              <strong>AI Resume #${idx + 1}</strong>
+              <p style='white-space: pre-wrap; font-size: 13px; color: var(--muted); margin: 8px 0 0 0;'>${cv.text.substring(0, 200)}...</p>
+            </div>`;
+          });
+        } else {
+          html += "<p style='color: var(--muted);'>Chưa có CV AI nào</p>";
+        }
+        html += "</div></div>";
+
+        content.innerHTML = html;
+      } catch (err) {
+        content.innerHTML = `<p style='color: var(--danger);'>Lỗi load CV: ${err.message}</p>`;
+      }
+    }
+
+    function closeCVList() {
+      document.getElementById("cvModal").style.display = "none";
     }
 
     // Poll stats every 1 second
