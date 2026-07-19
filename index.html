@@ -345,7 +345,7 @@
       <div class="timer" id="timerDisplay">02:00</div>
 
       <div class="instruction">
-        ✏️ Viết CV của bạn cho vị trí Nhân Viên May (bạn có 2 phút để viết như con người thật)
+        ✏️ Viết CV của bạn cho vị trí Nhân Viên May (bạn có 3 phút để viết như con người thật)
       </div>
 
       <textarea id="resumeText" placeholder="Nhập CV của bạn tại đây..."></textarea>
@@ -357,6 +357,7 @@
     <div class="section" id="votingSection">
       <div style="text-align: center; margin-bottom: 20px;">
         <div id="playerDisplay2" style="color: var(--muted); font-size: 14px;"></div>
+        <div class="timer" id="votingTimer">10:00</div>
       </div>
       <div id="votingContent"></div>
     </div>
@@ -374,9 +375,12 @@
 
     const API_BASE = "/api";
     const JOB_TITLE = "Nhân Viên May";
-    const WRITING_TIME = 120; // 2 minutes
+    const WRITING_TIME = 180; // 3 minutes
+    const VOTING_TIME = 600; // 10 minutes
     let writingTimeLeft = WRITING_TIME;
+    let votingTimeLeft = VOTING_TIME;
     let writingTimerInterval = null;
+    let votingTimerInterval = null;
 
     async function joinGame() {
       const mssvInput = document.getElementById("mssvInput");
@@ -448,6 +452,46 @@
       }
     }
 
+    function startVotingTimer() {
+      votingTimeLeft = VOTING_TIME;
+
+      if (votingTimerInterval) clearInterval(votingTimerInterval);
+
+      votingTimerInterval = setInterval(() => {
+        votingTimeLeft--;
+        const mins = Math.floor(votingTimeLeft / 60);
+        const secs = votingTimeLeft % 60;
+        const display = `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+        document.getElementById("votingTimer").textContent = display;
+
+        const timer = document.getElementById("votingTimer");
+        if (votingTimeLeft <= 60) {
+          timer.className = "timer danger";
+        } else if (votingTimeLeft <= 180) {
+          timer.className = "timer warning";
+        } else {
+          timer.className = "timer ok";
+        }
+
+        if (votingTimeLeft <= 0) {
+          clearInterval(votingTimerInterval);
+          document.getElementById("votingContent").innerHTML = `
+            <div class="voting-waiting">
+              <h2>⏰ Hết giờ vote!</h2>
+              <p class="pulse">✅ Cảm ơn bạn đã hoàn thành!</p>
+            </div>
+          `;
+        }
+      }, 1000);
+    }
+
+    function stopVotingTimer() {
+      if (votingTimerInterval) {
+        clearInterval(votingTimerInterval);
+        votingTimerInterval = null;
+      }
+    }
+
     function showWriting() {
       document.getElementById("playerDisplay").textContent = `MSSV: ${playerMSSV}`;
       showSection("writingSection");
@@ -501,6 +545,7 @@
       stopWritingTimer();
       document.getElementById("playerDisplay2").textContent = `MSSV: ${playerMSSV}`;
       showSection("votingSection");
+      startVotingTimer();
       loadNextCard();
     }
 
