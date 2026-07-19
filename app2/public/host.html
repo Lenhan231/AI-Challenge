@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Host Panel — May AI</title>
+  <title>Host Panel — Resume Battle</title>
   <style>
     * {
       margin: 0;
@@ -284,7 +284,33 @@
     .cv-list {
       display: grid;
       grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .cv-column {
+      display: flex;
+      flex-direction: column;
       gap: 16px;
+    }
+
+    .cv-column-title {
+      font-size: 16px;
+      font-weight: 700;
+      padding: 12px;
+      background: rgba(59, 130, 246, 0.1);
+      border-left: 4px solid;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+
+    .cv-column-title.human {
+      border-left-color: #f59e0b;
+      color: #f59e0b;
+    }
+
+    .cv-column-title.ai {
+      border-left-color: #3b82f6;
+      color: #3b82f6;
     }
 
     @media (max-width: 768px) {
@@ -370,7 +396,7 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>🎮 Host Control Panel</h1>
+      <h1>Resume Battle — Host Control Panel</h1>
       <p>Theo dõi thống kê trực tiếp • Quản lý CV</p>
     </div>
 
@@ -499,12 +525,14 @@
 
         let html = '<div class="cv-list">';
 
-        // Human CVs
+        // Human CVs Column
+        html += '<div class="cv-column">';
+        html += '<div class="cv-column-title human">👤 CV Người</div>';
         if (data.human && data.human.length > 0) {
           data.human.forEach((cv, idx) => {
             html += `
               <div class="cv-item human">
-                <h4>👤 CV Người #${idx + 1}</h4>
+                <h4>Người #${idx + 1}</h4>
                 <div class="cv-text">${cv.text}</div>
                 <div class="cv-vote">
                   <span>✅ ${cv.hire || 0}</span>
@@ -514,14 +542,19 @@
               </div>
             `;
           });
+        } else {
+          html += '<div style="color: #94a3b8; text-align: center; padding: 20px;">Chưa có CV</div>';
         }
+        html += '</div>';
 
-        // AI CVs
+        // AI CVs Column
+        html += '<div class="cv-column">';
+        html += '<div class="cv-column-title ai">🤖 CV AI</div>';
         if (data.ai && data.ai.length > 0) {
           data.ai.forEach((cv, idx) => {
             html += `
               <div class="cv-item ai">
-                <h4>🤖 CV AI #${idx + 1}</h4>
+                <h4>AI #${idx + 1}</h4>
                 <div class="cv-text">${cv.text}</div>
                 <div class="cv-vote">
                   <span>✅ ${cv.hire || 0}</span>
@@ -531,7 +564,10 @@
               </div>
             `;
           });
+        } else {
+          html += '<div style="color: #94a3b8; text-align: center; padding: 20px;">Chưa có CV</div>';
         }
+        html += '</div>';
 
         html += '</div>';
         document.getElementById("cvContent").innerHTML = html;
