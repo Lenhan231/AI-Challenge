@@ -1,4 +1,9 @@
-const FALLBACK_RESUME = `Kinh nghiệm làm việc 3-4 năm tại nhà máy may, thực hiện khâu may áo thun, đồng phục. Thành thạo máy may công nghiệp. Cẩn thận, chịu áp lực tốt, hợp tác hiệu quả với đồng đội.`;
+const FALLBACK_RESUMES = [
+  `Kinh nghiệm làm việc 3-4 năm tại nhà máy may, thực hiện khâu may áo thun, đồng phục. Thành thạo máy may công nghiệp. Cẩn thận, chịu áp lực tốt, hợp tác hiệu quả với đồng đội.`,
+  `Có 5 năm kinh nghiệm may công sở và đồng phục. Thành thạo máy may Juki, Brother. Kỹ năng cắt may, đo vải chính xác. Tính cách kiên nhẫn, tỉ mỉ, luôn hoàn thành đúng hạn.`,
+  `2 năm làm việc tại xưởng may chuyên may khâu đặc biệt. Thêu tay, cắt vải, may áo công sở. Máy may công nghiệp thành thạo. Chịu áp lực, hợp tác tốt, chú ý chất lượng.`,
+  `Kinh nghiệm may áo 4 năm, may quần áo nữ, vest, đồng phục. Kỹ năng đa dạng vải cotton, lụa, vải dệt. Máy may công nghiệp thành thạo. Cẩn thận, giao tiếp tốt.`
+];
 
 export async function generateAIResume(jobTitle, geminiKey, isQualityVariation = false, seed = 0) {
   if (!geminiKey) {
@@ -57,7 +62,8 @@ Chỉ viết: kinh nghiệm, kỹ năng, điểm mạnh. Không có thông tin c
         }
       }
 
-      return { text: FALLBACK_RESUME, fallback: true };
+      const fallback = FALLBACK_RESUMES[Math.floor(Math.random() * FALLBACK_RESUMES.length)];
+      return { text: fallback, fallback: true };
     }
 
     const data = await response.json();
@@ -66,7 +72,8 @@ Chỉ viết: kinh nghiệm, kỹ năng, điểm mạnh. Không có thông tin c
 
     if (!text.trim()) {
       console.warn("[Gemini] Empty response, fallback to generic resume");
-      return { text: FALLBACK_RESUME, fallback: true };
+      const fallback = FALLBACK_RESUMES[Math.floor(Math.random() * FALLBACK_RESUMES.length)];
+      return { text: fallback, fallback: true };
     }
 
     console.log(`[Gemini] ✅ Generated resume for ${jobTitle}`);
@@ -117,14 +124,16 @@ async function generateViaGroq(jobTitle, groqKey, isQualityVariation, specialty 
 
     if (!response.ok) {
       console.error(`[Groq] Failed, using fallback`);
-      return { text: FALLBACK_RESUME, fallback: true };
+      const fallback = FALLBACK_RESUMES[Math.floor(Math.random() * FALLBACK_RESUMES.length)];
+      return { text: fallback, fallback: true };
     }
 
     const data = await response.json();
     const text = data.choices?.[0]?.message?.content?.trim() || "";
 
     if (!text) {
-      return { text: FALLBACK_RESUME, fallback: true };
+      const fallback = FALLBACK_RESUMES[Math.floor(Math.random() * FALLBACK_RESUMES.length)];
+      return { text: fallback, fallback: true };
     }
 
     console.log(`[Groq] ✅ Generated resume for ${jobTitle}`);
