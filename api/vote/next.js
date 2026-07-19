@@ -61,37 +61,38 @@ export default async function handler(req, res) {
       queue = allResumes;
     }
 
-    // Get next card from queue
-    if (!queue || queue.length === 0) {
-      return res.status(200).json({
-        done: true,
-        message: "Hết bài rồi!",
-      });
-    }
+    // Find next unvoted resume
+    while (queue && queue.length > 0) {
+      const resumeId = queue[0];
+      const [type, id] = resumeId.split(":");
 
-    const resumeId = queue[0];
-    const [type, id] = resumeId.split(":");
+      // Check if already voted
+      const seen = await redis.sismember(`vote:${playerId}:seen`, resumeId);
+      if (!seen) {
+        // Not voted yet - fetch and return
+        let resumeData;
+        if (type === "human") {
+          resumeData = await redis.hgetall(`resume:human:${id}`);
+        } else {
+          resumeData = await redis.hgetall(`resume:ai:${id}`);
+        }
 
-    // Check if already voted
-    const seen = await redis.sismember(`vote:${playerId}:seen`, resumeId);
-    if (seen) {
-      // Skip and fetch next
+        return res.status(200).json({
+          done: false,
+          resumeId,
+          text: resumeData?.text || "[Không tìm thấy dữ liệu resume]",
+        });
+      }
+
+      // Already voted - remove and continue
       await redis.lpop(`vote:${playerId}:queue`);
-      return handler(req, res); // Recursive
+      queue = await redis.lrange(`vote:${playerId}:queue`, 0, -1);
     }
 
-    // Fetch resume text
-    let resumeData;
-    if (type === "human") {
-      resumeData = await redis.hgetall(`resume:human:${id}`);
-    } else {
-      resumeData = await redis.hgetall(`resume:ai:${id}`);
-    }
-
+    // Queue exhausted
     return res.status(200).json({
-      done: false,
-      resumeId,
-      text: resumeData?.text || "[Không tìm thấy dữ liệu resume]",
+      done: true,
+      message: "Hết bài rồi!",
     });
   } catch (err) {
     console.error("[vote/next.js]", err.message);
