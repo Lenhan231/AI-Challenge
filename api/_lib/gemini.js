@@ -23,22 +23,14 @@ export async function generateAIResume(jobTitle, geminiKey, isQualityVariation =
 
   const groqKey = process.env.GROQ_API_KEY;
 
-  // Simulate a human resume written in ~2 minutes
+  // Simulate a human resume written in ~2 minutes - very brief, vague
   const qualityPrompt = isQualityVariation
-    ? `Viết một bản CV/Resume tiếng Việt cho vị trí "${jobTitle}" như thể một người viết nhanh trong 2 phút (80-120 từ).
-Format đơn giản:
-- Tên & thông tin cơ bản (1-2 dòng)
-- Kinh nghiệm (1-2 dòng)
-- Điểm mạnh (1 dòng)
-
-Viết ngắn gọn, thiếu một số chi tiết, không quá formal nhưng vẫn có lý.`
-    : `Viết một bản CV/Resume tiếng Việt cho vị trí "${jobTitle}" như thể một người viết cẩn thận trong 2 phút (100-150 từ).
-Format:
-- Tên, ngày sinh, liên hệ (2-3 dòng)
-- Kinh nghiệm chính (2-3 dòng)
-- Điểm mạnh (2 dòng)
-
-Viết professional nhưng simple, chỉ đủ thông tin cần thiết.`;
+    ? `Viết một bản CV/Resume rất ngắn tiếng Việt cho vị trí "${jobTitle}" (40-60 từ).
+Viết như một người vội vàng, bỏ chi tiết cụ thể.
+Ví dụ: "Tên: [tên]. May công nghiệp 3 năm. Khéo léo, chịu áp lực tốt."`
+    : `Viết một bản CV/Resume ngắn tiếng Việt cho vị trí "${jobTitle}" (60-80 từ).
+Viết đơn giản, không thêm chi tiết như ngày sinh, địa chỉ đầy đủ.
+Chỉ cần: tên, kinh nghiệm, 1-2 kỹ năng chính.`;
 
   try {
     const controller = new AbortController();
@@ -107,8 +99,8 @@ Viết professional nhưng simple, chỉ đủ thông tin cần thiết.`;
 
 async function generateViaGroq(jobTitle, groqKey, isQualityVariation) {
   const qualityPrompt = isQualityVariation
-    ? `Viết một bản CV/Resume tiếng Việt cho vị trí "${jobTitle}" như thể một người viết nhanh trong 2 phút (80-120 từ). Viết ngắn gọn, thiếu chi tiết nhưng vẫn có lý.`
-    : `Viết một bản CV/Resume tiếng Việt cho vị trí "${jobTitle}" như thể một người viết cẩn thận trong 2 phút (100-150 từ). Viết professional nhưng simple.`;
+    ? `Viết một bản CV/Resume rất ngắn tiếng Việt cho vị trí "${jobTitle}" (40-60 từ). Viết như vội vàng, bỏ chi tiết.`
+    : `Viết một bản CV/Resume ngắn tiếng Việt cho vị trí "${jobTitle}" (60-80 từ). Chỉ cần tên, kinh nghiệm, kỹ năng.`;
 
   try {
     const controller = new AbortController();
