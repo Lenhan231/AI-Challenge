@@ -1,12 +1,5 @@
 {
-  "name": "may-ai-vote",
   "version": 2,
-  "env": {
-    "GEMINI_API_KEY": "@gemini_key",
-    "GROQ_API_KEY": "@groq_key",
-    "KV_REST_API_URL": "@redis_url",
-    "KV_REST_API_TOKEN": "@redis_token"
-  },
   "builds": [
     {
       "src": "api/**/*.js",
