@@ -395,8 +395,6 @@
         });
 
         if (res.ok) {
-          const data = await res.json();
-          playerId = data.playerId; // Use playerId from server (deduped)
           sessionStorage.setItem("playerMSSV", playerMSSV);
           hasJoined = true;
           mssvInput.disabled = true;

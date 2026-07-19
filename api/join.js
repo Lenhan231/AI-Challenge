@@ -25,23 +25,9 @@ export default async function handler(req, res) {
     }
 
     const redis = getRedisClient();
+    await redis.set(`player:${playerId}:name`, name);
 
-    // Check if MSSV already exists (dedup multiple refreshes)
-    const existingPlayerId = await redis.get(`mssv:${name}`);
-    let finalPlayerId = playerId;
-
-    if (existingPlayerId) {
-      // Use existing playerId for this MSSV
-      finalPlayerId = existingPlayerId;
-    } else {
-      // New MSSV - create mapping
-      await redis.set(`mssv:${name}`, playerId);
-    }
-
-    // Store player name
-    await redis.set(`player:${finalPlayerId}:name`, name);
-
-    return res.status(200).json({ playerId: finalPlayerId, name });
+    return res.status(200).json({ playerId, name });
   } catch (err) {
     console.error("[join.js]", err.message);
     return res.status(500).json({ error: err.message });

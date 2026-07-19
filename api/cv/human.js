@@ -19,7 +19,6 @@ export default async function handler(req, res) {
 
     // Get all human resume IDs
     const playerIds = await redis.smembers("resumes:human");
-    console.log(`[cv/human.js] Fetching resumes - resumes:human contains:`, playerIds);
     const resumes = [];
 
     if (playerIds) {
