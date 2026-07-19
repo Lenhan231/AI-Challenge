@@ -485,6 +485,10 @@
     }
 
     async function vote(resumeId, decision) {
+      // Disable buttons to prevent double-click
+      const buttons = document.querySelectorAll(".btn-hire, .btn-reject");
+      buttons.forEach(btn => btn.disabled = true);
+
       try {
         const res = await fetch(`${API_BASE}/vote/submit`, {
           method: "POST",
@@ -493,15 +497,19 @@
         });
 
         if (res.ok) {
-          loadNextCard();
+          await loadNextCard();
         } else {
           const errorData = await res.json();
           console.error("Vote error:", errorData);
           alert(`Lỗi vote: ${errorData.error || "unknown"}`);
+          // Re-enable buttons on error
+          buttons.forEach(btn => btn.disabled = false);
         }
       } catch (err) {
         console.error("Vote exception:", err);
         alert(`Lỗi: ${err.message}`);
+        // Re-enable buttons on error
+        buttons.forEach(btn => btn.disabled = false);
       }
     }
 
