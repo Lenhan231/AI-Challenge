@@ -18,23 +18,26 @@ export default async function handler(req, res) {
   try {
     const redis = getRedisClient();
 
-    // Reset all vote counters (keep CVs)
-    const keys = await redis.keys("votes:*");
-    if (keys && keys.length > 0) {
-      for (const key of keys) {
-        await redis.del(key);
+    // Clear ALL game data
+    const patterns = [
+      "player:*",           // player info
+      "resume:*",           // resumes (both human and AI)
+      "resumes:*",          // resume sets
+      "votes:*",            // vote counters
+      "vote:*",             // player vote tracking
+      "ai:resume:counter"   // AI counter
+    ];
+
+    for (const pattern of patterns) {
+      const keys = await redis.keys(pattern);
+      if (keys && keys.length > 0) {
+        for (const key of keys) {
+          await redis.del(key);
+        }
       }
     }
 
-    // Reset player vote tracking
-    const playerVoteKeys = await redis.keys("vote:*");
-    if (playerVoteKeys && playerVoteKeys.length > 0) {
-      for (const key of playerVoteKeys) {
-        await redis.del(key);
-      }
-    }
-
-    return res.status(200).json({ ok: true, message: "Vote stats reset, CVs preserved" });
+    return res.status(200).json({ ok: true, message: "All game data cleared" });
   } catch (err) {
     console.error("[reset.js]", err.message);
     return res.status(500).json({ error: err.message });
