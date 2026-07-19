@@ -28,41 +28,46 @@ export default async function handler(req, res) {
 
       if (!queue || queue.length === 0) {
         // First time - select 4 random AI + 4 random human resumes
-        const humanIds = await redis.smembers("resumes:human");
-        const aiIds = await redis.smembers("resumes:ai");
+        const humanIds = await redis.smembers("resumes:human") || [];
+        const aiIds = await redis.smembers("resumes:ai") || [];
 
         // Remove player's own resume
-        const ownResumeId = playerId;
-        const filteredHumanIds = humanIds ? humanIds.filter(id => id !== ownResumeId) : [];
-        const filteredAiIds = aiIds || [];
+        const filteredHumanIds = humanIds.filter(id => id !== playerId);
+        const filteredAiIds = aiIds;
 
-        // Shuffle helper
+        // Shuffle helper with seeded random
         const seededShuffle = (arr, seed) => {
           const shuffled = [...arr];
+          let s = seed;
           for (let i = shuffled.length - 1; i > 0; i--) {
-            const j = Math.floor((Math.sin(seed++) * 10000) % (i + 1));
+            s = (s * 9301 + 49297) % 233280; // Linear congruential generator
+            const j = Math.abs(s) % (i + 1);
             [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
           }
           return shuffled;
         };
 
         // Pick 4 random human resumes
-        const humanSeed = playerId.charCodeAt(0);
+        const humanSeed = playerId.charCodeAt(0) * 1000;
         const shuffledHuman = seededShuffle(filteredHumanIds, humanSeed);
-        const selected4Human = shuffledHuman.slice(0, 4).map(id => `human:${id}`);
+        const selected4Human = shuffledHuman.slice(0, 4);
 
         // Pick 4 random AI resumes
-        const aiSeed = playerId.charCodeAt(1) || 1;
+        const aiSeed = (playerId.charCodeAt(1) || 1) * 2000;
         const shuffledAi = seededShuffle(filteredAiIds, aiSeed);
-        const selected4Ai = shuffledAi.slice(0, 4).map(id => `ai:${id}`);
+        const selected4Ai = shuffledAi.slice(0, 4);
 
-        // Combine and shuffle final 8
-        const final8 = [...selected4Human, ...selected4Ai];
-        const finalSeed = playerId.charCodeAt(2) || 2;
-        const shuffledFinal = seededShuffle(final8, finalSeed);
+        // Combine: 4 human + 4 AI
+        const combined8 = [];
+        selected4Human.forEach(id => combined8.push(`human:${id}`));
+        selected4Ai.forEach(id => combined8.push(`ai:${id}`));
+
+        // Final shuffle of all 8
+        const finalSeed = (playerId.charCodeAt(2) || 2) * 3000;
+        const shuffledFinal = seededShuffle(combined8, finalSeed);
 
         // Push to queue
-        if (shuffledFinal.length > 0) {
+        if (shuffledFinal && shuffledFinal.length > 0) {
           await redis.rpush(`vote:${playerId}:queue`, ...shuffledFinal);
         }
         queue = shuffledFinal;
