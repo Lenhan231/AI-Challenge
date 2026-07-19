@@ -5,3 +5,5 @@
 .env.local
 .env*.local
 node_modules/
+test.py
+test-api.js
