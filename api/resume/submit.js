@@ -58,7 +58,7 @@ export default async function handler(req, res) {
         // Try to generate AI resume
         try {
           const isQualityVariation = i % 2 === 1; // Alternate quality
-          const aiResult = await generateAIResume(GAME_JOB_TITLE, geminiKey, isQualityVariation);
+          const aiResult = await generateAIResume(GAME_JOB_TITLE, geminiKey, isQualityVariation, i);
 
           // Store AI resume with unique index
           const aiIndex = await redis.incr("ai:resume:counter");

@@ -1,21 +1,6 @@
-const FALLBACK_RESUME = `CV - Ứng Viên Nhân Viên May
+const FALLBACK_RESUME = `Kinh nghiệm làm việc 3-4 năm tại nhà máy may, thực hiện khâu may áo thun, đồng phục. Thành thạo máy may công nghiệp. Cẩn thận, chịu áp lực tốt, hợp tác hiệu quả với đồng đội.`;
 
-THÔNG TIN CÁ NHÂN
-- Kỹ năng may vá cơ bản
-- Kinh nghiệm làm việc được yêu cầu
-- Tham vọng phát triển sự nghiệp
-
-KINH NGHIỆM LÀM VIỆC
-- Làm việc với các loại vải khác nhau
-- Hợp tác trong môi trường xưởng may
-- Hoàn thành các đơn hàng đúng hạn chót
-
-ĐIỂM MẠNH
-- Khả năng may vá tỉ mỉ
-- Chịu áp lực công việc tốt
-- Giao tiếp hiệu quả với đồng đội`;
-
-export async function generateAIResume(jobTitle, geminiKey, isQualityVariation = false) {
+export async function generateAIResume(jobTitle, geminiKey, isQualityVariation = false, seed = 0) {
   if (!geminiKey) {
     console.warn("[AI] No API key provided, using fallback");
     return { text: FALLBACK_RESUME, fallback: true };
@@ -23,12 +8,16 @@ export async function generateAIResume(jobTitle, geminiKey, isQualityVariation =
 
   const groqKey = process.env.GROQ_API_KEY;
 
+  // Add diversity: different specialties to avoid duplicate resumes
+  const specialties = ["cắt may", "khâu đặc biệt", "kiểm chất lượng", "may áo công sở", "may thêu"];
+  const specialty = specialties[seed % specialties.length];
+
   // Simulate a human resume written in ~2 minutes - skills & traits only, NO personal info, plain text
   const qualityPrompt = isQualityVariation
-    ? `Viết CV rất ngắn tiếng Việt cho "${jobTitle}" (40-60 từ). Plain text, KHÔNG markdown.
+    ? `Viết CV rất ngắn tiếng Việt cho "${jobTitle}" chuyên ${specialty} (40-60 từ). Plain text, KHÔNG markdown.
 Không có: tên, sinh năm, địa chỉ, điện thoại.
 Chỉ: kinh nghiệm, kỹ năng, tính cách. Không dùng **, đầu dòng hay format.`
-    : `Viết CV ngắn tiếng Việt cho "${jobTitle}" (60-80 từ). Plain text, KHÔNG markdown hoặc ** hoặc -.
+    : `Viết CV ngắn tiếng Việt cho "${jobTitle}" chuyên ${specialty} (60-80 từ). Plain text, KHÔNG markdown hoặc ** hoặc -.
 Chỉ viết: kinh nghiệm, kỹ năng, điểm mạnh. Không có thông tin cá nhân.`;
 
   try {
@@ -60,7 +49,9 @@ Chỉ viết: kinh nghiệm, kỹ năng, điểm mạnh. Không có thông tin c
       // Try Groq as fallback
       if (groqKey) {
         console.log(`[Groq] Attempting fallback...`);
-        const groqResume = await generateViaGroq(jobTitle, groqKey, isQualityVariation);
+        const specialties = ["cắt may", "khâu đặc biệt", "kiểm chất lượng", "may áo công sở", "may thêu"];
+        const specialty = specialties[seed % specialties.length];
+        const groqResume = await generateViaGroq(jobTitle, groqKey, isQualityVariation, specialty);
         if (!groqResume.fallback) {
           return groqResume;
         }
@@ -86,7 +77,9 @@ Chỉ viết: kinh nghiệm, kỹ năng, điểm mạnh. Không có thông tin c
     // Try Groq as fallback
     if (groqKey) {
       console.log(`[Groq] Attempting fallback...`);
-      const groqResume = await generateViaGroq(jobTitle, groqKey, isQualityVariation);
+      const specialties = ["cắt may", "khâu đặc biệt", "kiểm chất lượng", "may áo công sở", "may thêu"];
+      const specialty = specialties[seed % specialties.length];
+      const groqResume = await generateViaGroq(jobTitle, groqKey, isQualityVariation, specialty);
       if (!groqResume.fallback) {
         return groqResume;
       }
@@ -96,10 +89,10 @@ Chỉ viết: kinh nghiệm, kỹ năng, điểm mạnh. Không có thông tin c
   }
 }
 
-async function generateViaGroq(jobTitle, groqKey, isQualityVariation) {
+async function generateViaGroq(jobTitle, groqKey, isQualityVariation, specialty = "chung chung") {
   const qualityPrompt = isQualityVariation
-    ? `Viết CV plain text cho "${jobTitle}" (40-60 từ). Không **, không -, không markdown. Chỉ: kinh nghiệm, kỹ năng, tính cách.`
-    : `Viết CV plain text cho "${jobTitle}" (60-80 từ). Không **, không -, không markdown. Chỉ: kinh nghiệm, kỹ năng, điểm mạnh.`;
+    ? `Viết CV plain text cho "${jobTitle}" chuyên ${specialty} (40-60 từ). Không **, không -, không markdown. Chỉ: kinh nghiệm, kỹ năng, tính cách.`
+    : `Viết CV plain text cho "${jobTitle}" chuyên ${specialty} (60-80 từ). Không **, không -, không markdown. Chỉ: kinh nghiệm, kỹ năng, điểm mạnh.`;
 
   try {
     const controller = new AbortController();
