@@ -24,59 +24,59 @@ export default async function handler(req, res) {
     }
 
     const redis = getRedisClient();
-
-    // Check if already submitted
-    const alreadySubmitted = await redis.get(`player:${playerId}:submitted`);
-    if (alreadySubmitted) {
-      return res.status(200).json({ ok: true, message: "Resume already submitted" });
-    }
-
-    // Store human resume
     const now = Date.now();
     const playerName = (await redis.get(`player:${playerId}:name`)) || playerId;
 
+    // Check if resume already exists
+    const existingResume = await redis.hgetall(`resume:human:${playerId}`);
+    const isUpdate = !!existingResume && existingResume.text;
+
+    // Update or create resume
     await redis.hset(`resume:human:${playerId}`, {
       playerName,
       text,
       submittedAt: now.toString(),
     });
 
-    // Add to human resumes set
+    // Ensure added to set
     await redis.sadd("resumes:human", playerId);
 
     // Mark as submitted
     await redis.set(`player:${playerId}:submitted`, "1");
 
-    // Generate 1-3 AI resumes (random)
-    const aiCount = Math.floor(Math.random() * 3) + 1; // 1-3
-    const geminiKey = process.env.GEMINI_API_KEY;
+    // Only generate AI resumes if this is NEW submission, not update
+    let aiCount = 0;
+    if (!isUpdate) {
+      aiCount = Math.floor(Math.random() * 3) + 1; // 1-3
+      const geminiKey = process.env.GEMINI_API_KEY;
 
-    if (!geminiKey) {
-      console.warn("[resume/submit] GEMINI_API_KEY not set, skipping AI generation");
-    } else {
-      for (let i = 0; i < aiCount; i++) {
-        // Try to generate AI resume
-        try {
-          const isQualityVariation = i % 2 === 1; // Alternate quality
-          const aiResult = await generateAIResume(GAME_JOB_TITLE, geminiKey, isQualityVariation, i);
+      if (!geminiKey) {
+        console.warn("[resume/submit] GEMINI_API_KEY not set, skipping AI generation");
+      } else {
+        for (let i = 0; i < aiCount; i++) {
+          // Try to generate AI resume
+          try {
+            const isQualityVariation = i % 2 === 1; // Alternate quality
+            const aiResult = await generateAIResume(GAME_JOB_TITLE, geminiKey, isQualityVariation, i);
 
-          // Store AI resume with unique index
-          const aiIndex = await redis.incr("ai:resume:counter");
-          await redis.hset(`resume:ai:${aiIndex}`, {
-            text: aiResult.text,
-            generatedAt: now.toString(),
-            fallback: aiResult.fallback ? "1" : "0",
-          });
+            // Store AI resume with unique index
+            const aiIndex = await redis.incr("ai:resume:counter");
+            await redis.hset(`resume:ai:${aiIndex}`, {
+              text: aiResult.text,
+              generatedAt: now.toString(),
+              fallback: aiResult.fallback ? "1" : "0",
+            });
 
-          // Add to AI resumes set
-          await redis.sadd("resumes:ai", aiIndex.toString());
-        } catch (err) {
-          console.error(`[resume/submit] Error generating AI resume ${i}:`, err.message);
+            // Add to AI resumes set
+            await redis.sadd("resumes:ai", aiIndex.toString());
+          } catch (err) {
+            console.error(`[resume/submit] Error generating AI resume ${i}:`, err.message);
+          }
         }
       }
     }
 
-    return res.status(200).json({ ok: true, aiCount });
+    return res.status(200).json({ ok: true, aiCount, isUpdate });
   } catch (err) {
     console.error("[resume/submit.js]", err.message);
     return res.status(500).json({ error: err.message });
