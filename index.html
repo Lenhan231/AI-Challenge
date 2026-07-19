@@ -369,7 +369,7 @@
       localStorage.setItem("playerId", playerId);
     }
 
-    let playerMSSV = localStorage.getItem("playerMSSV") || "";
+    let playerMSSV = sessionStorage.getItem("playerMSSV") || "";
     let gameState = { phase: "lobby" };
     let resumeSubmitted = false;
     let hasJoined = !!playerMSSV;
@@ -397,7 +397,7 @@
         });
 
         if (res.ok) {
-          localStorage.setItem("playerMSSV", playerMSSV);
+          sessionStorage.setItem("playerMSSV", playerMSSV);
           hasJoined = true;
           mssvInput.disabled = true;
           document.querySelector(".lobby-form button").disabled = true;
