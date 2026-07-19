@@ -23,15 +23,13 @@ export async function generateAIResume(jobTitle, geminiKey, isQualityVariation =
 
   const groqKey = process.env.GROQ_API_KEY;
 
-  // Simulate a human resume written in ~2 minutes - skills & traits only, NO personal info
+  // Simulate a human resume written in ~2 minutes - skills & traits only, NO personal info, plain text
   const qualityPrompt = isQualityVariation
-    ? `Viết một bản CV/Resume rất ngắn tiếng Việt cho vị trí "${jobTitle}" (40-60 từ).
-KHÔNG có thông tin cá nhân (tên, sinh năm, địa chỉ, điện thoại).
-CHỈ viết: kinh nghiệm, kỹ năng, tính cách, điểm mạnh.
-Ví dụ: "2 năm may công nghiệp. Thành thạo máy may, thêu. Cẩn thận, chịu áp lực."`
-    : `Viết một bản CV/Resume ngắn tiếng Việt cho vị trí "${jobTitle}" (60-80 từ).
-KHÔNG có thông tin cá nhân (tên, sinh năm, địa chỉ, điện thoại, email).
-CHỈ viết: kinh nghiệm làm việc, kỹ năng chuyên môn, tính cách, điểm đặc biệt.`;
+    ? `Viết CV rất ngắn tiếng Việt cho "${jobTitle}" (40-60 từ). Plain text, KHÔNG markdown.
+Không có: tên, sinh năm, địa chỉ, điện thoại.
+Chỉ: kinh nghiệm, kỹ năng, tính cách. Không dùng **, đầu dòng hay format.`
+    : `Viết CV ngắn tiếng Việt cho "${jobTitle}" (60-80 từ). Plain text, KHÔNG markdown hoặc ** hoặc -.
+Chỉ viết: kinh nghiệm, kỹ năng, điểm mạnh. Không có thông tin cá nhân.`;
 
   try {
     const controller = new AbortController();
@@ -100,8 +98,8 @@ CHỈ viết: kinh nghiệm làm việc, kỹ năng chuyên môn, tính cách, �
 
 async function generateViaGroq(jobTitle, groqKey, isQualityVariation) {
   const qualityPrompt = isQualityVariation
-    ? `Viết CV cho vị trí "${jobTitle}" (40-60 từ). Không có tên, sinh năm, địa chỉ. Chỉ: kinh nghiệm, kỹ năng, tính cách.`
-    : `Viết CV cho vị trí "${jobTitle}" (60-80 từ). Không có thông tin cá nhân. Chỉ: kinh nghiệm, kỹ năng, điểm mạnh.`;
+    ? `Viết CV plain text cho "${jobTitle}" (40-60 từ). Không **, không -, không markdown. Chỉ: kinh nghiệm, kỹ năng, tính cách.`
+    : `Viết CV plain text cho "${jobTitle}" (60-80 từ). Không **, không -, không markdown. Chỉ: kinh nghiệm, kỹ năng, điểm mạnh.`;
 
   try {
     const controller = new AbortController();
