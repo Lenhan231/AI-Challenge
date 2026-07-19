@@ -554,6 +554,13 @@
         const res = await fetch(`${API_BASE}/vote?playerId=${playerId}`);
         const data = await res.json();
 
+        // Handle API errors
+        if (!res.ok) {
+          console.error("API error:", data);
+          setTimeout(loadNextCard, 1000); // Retry
+          return;
+        }
+
         if (data.done) {
           document.getElementById("votingContent").innerHTML = `
             <div class="voting-waiting">
@@ -566,6 +573,12 @@
           `;
           // Poll every 2s to see if new resumes available
           setTimeout(checkForMoreResumes, 2000);
+          return;
+        }
+
+        if (!data.text || !data.resumeId) {
+          console.error("Invalid response:", data);
+          setTimeout(loadNextCard, 1000); // Retry
           return;
         }
 
@@ -582,6 +595,7 @@
         document.getElementById("votingContent").innerHTML = cardHtml;
       } catch (err) {
         console.error("Load card error:", err);
+        setTimeout(loadNextCard, 1000); // Retry on error
       }
     }
 
