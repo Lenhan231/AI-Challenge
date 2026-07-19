@@ -380,13 +380,27 @@
       }
     }
 
-    function resetStats() {
+    async function resetStats() {
       if (
         confirm(
-          "Bạn có chắc muốn reset tất cả stats? Điều này sẽ không xóa CV mà chỉ reset vote counters."
+          "Bạn có chắc muốn reset vote counters? (CV sẽ được giữ lại)"
         )
       ) {
-        log("⚠️ Reset stats (chưa implement)", "warning");
+        try {
+          const res = await fetch(`${API_BASE}/reset`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          });
+
+          if (res.ok) {
+            log("✅ Reset vote counters xong", "success");
+            loadStats();
+          } else {
+            log("❌ Reset thất bại", "error");
+          }
+        } catch (err) {
+          log(`❌ ${err.message}`, "error");
+        }
       }
     }
 
