@@ -41,6 +41,10 @@ export default async function handler(req, res) {
     // Ensure added to set
     await redis.sadd("resumes:human", playerId);
 
+    // Debug: log current state
+    const allPlayerIds = await redis.smembers("resumes:human");
+    console.log(`[resume/submit] After submit - resumes:human set contains:`, allPlayerIds);
+
     // Mark as submitted
     await redis.set(`player:${playerId}:submitted`, "1");
 
