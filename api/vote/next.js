@@ -22,22 +22,23 @@ export default async function handler(req, res) {
 
     const redis = getRedisClient();
 
+    // Check if we have minimum resumes to start voting
+    const humanIds = await redis.smembers("resumes:human");
+    const aiIds = await redis.smembers("resumes:ai");
+    const totalResumes = (humanIds?.length || 0) + (aiIds?.length || 0);
+
+    if (totalResumes < 2) {
+      return res.status(200).json({
+        done: true,
+        message: "Chưa đủ resume để vote. Chờ mọi người viết xong...",
+      });
+    }
+
     // Get or build voting queue for this player
     let queue = await redis.lrange(`vote:${playerId}:queue`, 0, -1);
 
     if (!queue || queue.length === 0) {
       // First time: build queue from human + AI resumes
-      const humanIds = await redis.smembers("resumes:human");
-      const aiIds = await redis.smembers("resumes:ai");
-
-      if ((!humanIds || humanIds.length === 0) && (!aiIds || aiIds.length === 0)) {
-        return res.status(200).json({
-          done: true,
-          message: "Chưa có resume nào. Chờ mọi người viết...",
-        });
-      }
-
-      // Build list of all resumes
       let allResumes = [];
       if (humanIds) {
         allResumes = allResumes.concat(humanIds.map((id) => `human:${id}`));
