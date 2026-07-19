@@ -47,8 +47,8 @@ export default async function handler(req, res) {
     // Mark as submitted
     await redis.set(`player:${playerId}:submitted`, "1");
 
-    // Generate 1-3 AI resumes (random)
-    const aiCount = Math.floor(Math.random() * 3) + 1; // 1-3
+    // Generate 1 AI resume per user
+    const aiCount = 1;
     const geminiKey = process.env.GEMINI_API_KEY;
 
     if (!geminiKey) {
