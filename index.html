@@ -363,11 +363,9 @@
   </div>
 
   <script>
-    let playerId = localStorage.getItem("playerId");
-    if (!playerId) {
-      playerId = crypto.randomUUID();
-      localStorage.setItem("playerId", playerId);
-    }
+    // Generate new playerId each session (don't persist in localStorage)
+    // This prevents cross-tab MSSV collision
+    let playerId = crypto.randomUUID();
 
     let playerMSSV = sessionStorage.getItem("playerMSSV") || "";
     let gameState = { phase: "lobby" };
