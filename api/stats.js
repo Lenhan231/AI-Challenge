@@ -17,18 +17,22 @@ export default async function handler(req, res) {
   try {
     const redis = getRedisClient();
 
-    // Count players by scanning for player:*:name keys
-    // This is approximate but good enough for real-time stats
-    const keys = await redis.keys("player:*:name");
-    const playerCount = keys ? keys.length : 0;
+    // Count players
+    const playerKeys = await redis.keys("player:*:name");
+    const playerCount = playerKeys ? playerKeys.length : 0;
 
-    // Count resumes in voting pool
-    const jobTitles = await redis.smembers("resumes:allJobTitles");
-    const resumeCount = jobTitles ? jobTitles.length * 2 : 0; // 2 per job title (human + ai)
+    // Count human and AI resumes
+    const humanResumes = await redis.smembers("resumes:human");
+    const aiResumes = await redis.smembers("resumes:ai");
+    const humanCount = humanResumes ? humanResumes.length : 0;
+    const aiCount = aiResumes ? aiResumes.length : 0;
+    const totalResumes = humanCount + aiCount;
 
     return res.status(200).json({
       playerCount,
-      resumeCount,
+      humanCount,
+      aiCount,
+      totalResumes,
     });
   } catch (err) {
     console.error("[stats.js]", err.message);

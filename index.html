@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Tuyển Dụng — Trò Chơi Tương Tác</title>
+  <title>May AI — Trò Chơi Tương Tác</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -37,7 +37,7 @@
 
     .header {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 30px;
     }
 
     .header h1 {
@@ -85,6 +85,7 @@
       gap: 12px;
       margin-top: 20px;
       justify-content: center;
+      flex-wrap: wrap;
     }
 
     .lobby-form input {
@@ -121,27 +122,28 @@
       color: var(--muted);
     }
 
-    /* Writing Phase */
+    /* Writing Section */
     .writing {
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
 
-    .countdown {
+    .job-title-box {
+      background: var(--bg);
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
       font-size: 24px;
       font-weight: bold;
-      color: var(--warning);
-      text-align: center;
+      color: var(--accent);
     }
 
-    .job-title {
-      font-size: 20px;
-      font-weight: bold;
-      padding: 16px;
-      background: var(--bg);
-      border-radius: 8px;
-      border-left: 4px solid var(--accent);
+    .instruction {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 10px;
     }
 
     textarea {
@@ -153,7 +155,7 @@
       color: var(--text);
       font-family: inherit;
       resize: vertical;
-      min-height: 250px;
+      min-height: 300px;
     }
 
     .submit-btn {
@@ -177,7 +179,7 @@
       cursor: not-allowed;
     }
 
-    /* Voting Phase */
+    /* Voting Section */
     .voting {
       display: flex;
       flex-direction: column;
@@ -190,9 +192,9 @@
       border: 2px solid var(--accent);
       border-radius: 12px;
       padding: 30px;
-      max-width: 600px;
+      max-width: 700px;
       width: 100%;
-      min-height: 300px;
+      min-height: 350px;
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -210,20 +212,16 @@
       }
     }
 
-    .card-job {
-      font-size: 14px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
     .card-text {
       flex: 1;
       font-size: 16px;
       line-height: 1.8;
       white-space: pre-wrap;
       overflow-y: auto;
-      max-height: 350px;
+      max-height: 400px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
     }
 
     .card-actions {
@@ -232,7 +230,8 @@
       justify-content: center;
     }
 
-    .btn-hire, .btn-reject {
+    .btn-hire,
+    .btn-reject {
       padding: 12px 32px;
       font-size: 16px;
       font-weight: bold;
@@ -263,87 +262,37 @@
       transform: scale(1.05);
     }
 
-    .voting-done {
+    .voting-waiting {
       text-align: center;
-      padding: 40px 20px;
-    }
-
-    .voting-done h2 {
-      font-size: 24px;
-      color: var(--success);
-    }
-
-    /* Results Phase */
-    .results {
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-    }
-
-    .result-group {
-      background: var(--bg);
-      border-radius: 8px;
-      padding: 20px;
-      border-left: 4px solid var(--accent);
-    }
-
-    .result-label {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 12px;
-    }
-
-    .result-rate {
-      font-size: 32px;
-      font-weight: bold;
-      color: var(--accent);
-      margin-bottom: 8px;
-    }
-
-    .result-bar {
-      height: 30px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 4px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .result-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--success));
-      width: 0%;
-      transition: width 0.6s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 14px;
-    }
-
-    .result-stats {
-      font-size: 14px;
+      padding: 60px 20px;
       color: var(--muted);
-      margin-top: 8px;
     }
 
-    .comparison {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-top: 20px;
+    .voting-waiting h2 {
+      font-size: 24px;
+      color: var(--text);
+      margin-bottom: 10px;
     }
 
-    @media (max-width: 768px) {
-      .comparison {
-        grid-template-columns: 1fr;
-      }
+    .voting-waiting p {
+      margin: 8px 0;
+    }
+
+    .pulse {
+      display: inline-block;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>🤖 AI Tuyển Dụng</h1>
+      <h1>🧵 May AI</h1>
       <p>Trò chơi tương tác: Con người vs AI</p>
     </div>
 
@@ -352,50 +301,36 @@
       <h2>Chào mừng!</h2>
       <p>Nhập MSSV của bạn để bắt đầu:</p>
       <div class="lobby-form">
-        <input type="text" id="nameInput" placeholder="MSSV của bạn" maxlength="50">
+        <input type="text" id="mssvInput" placeholder="MSSV của bạn" maxlength="20">
         <button onclick="joinGame()">Tham gia</button>
       </div>
-      <div class="status" id="lobbyStatus">Chờ host bắt đầu...</div>
+      <div class="status" id="lobbyStatus">Chờ...</div>
     </div>
 
-    <!-- Writing Phase -->
+    <!-- Writing Section -->
     <div class="section" id="writingSection">
-      <div class="countdown" id="writingCountdown"></div>
-      <div class="job-title" id="jobTitleDisplay"></div>
-      <label for="resumeText">Viết resume của bạn cho vị trí trên (150-300 từ):</label>
-      <textarea id="resumeText" placeholder="Nhập resume của bạn tại đây..."></textarea>
-      <button class="submit-btn" id="submitBtn" onclick="submitResume()">Nộp Resume</button>
+      <div style="text-align: center; margin-bottom: 20px;">
+        <div id="playerDisplay" style="color: var(--muted); font-size: 14px; margin-bottom: 10px;"></div>
+        <div class="job-title-box">
+          📝 Nhân Viên May
+        </div>
+      </div>
+
+      <div class="instruction">
+        ✏️ Viết CV của bạn cho vị trí Nhân Viên May (150-300 từ)
+      </div>
+
+      <textarea id="resumeText" placeholder="Nhập CV của bạn tại đây..."></textarea>
+      <button class="submit-btn" id="submitBtn" onclick="submitResume()">Nộp CV</button>
       <div class="status" id="writingStatus"></div>
     </div>
 
-    <!-- Voting Phase -->
+    <!-- Voting Section -->
     <div class="section" id="votingSection">
-      <div class="countdown" id="votingCountdown"></div>
-      <div id="votingContent"></div>
-    </div>
-
-    <!-- Results Phase -->
-    <div class="section" id="resultsSection">
-      <h2>📊 Kết Quả</h2>
-      <p>So sánh tỉ lệ Hire giữa bản AI và bản người:</p>
-      <div class="comparison">
-        <div class="result-group">
-          <div class="result-label">🤖 Resume AI</div>
-          <div class="result-rate" id="aiRate">0%</div>
-          <div class="result-bar">
-            <div class="result-fill" id="aiFill" style="width: 0%"></div>
-          </div>
-          <div class="result-stats" id="aiStats"></div>
-        </div>
-        <div class="result-group">
-          <div class="result-label">👤 Resume Người</div>
-          <div class="result-rate" id="humanRate">0%</div>
-          <div class="result-bar">
-            <div class="result-fill" id="humanFill" style="width: 0%; background: linear-gradient(90deg, var(--warning), var(--danger));"></div>
-          </div>
-          <div class="result-stats" id="humanStats"></div>
-        </div>
+      <div style="text-align: center; margin-bottom: 20px;">
+        <div id="playerDisplay2" style="color: var(--muted); font-size: 14px;"></div>
       </div>
+      <div id="votingContent"></div>
     </div>
   </div>
 
@@ -406,19 +341,19 @@
       localStorage.setItem("playerId", playerId);
     }
 
-    let playerName = localStorage.getItem("playerName") || "";
-    let gameState = { phase: "lobby", deadline: null, startedAt: null };
-    let jobTitle = "";
+    let playerMSSV = localStorage.getItem("playerMSSV") || "";
+    let gameState = { phase: "lobby" };
     let resumeSubmitted = false;
-    let hasJoined = !!playerName;
+    let hasJoined = !!playerMSSV;
 
     const API_BASE = "/api";
+    const JOB_TITLE = "Nhân Viên May";
 
     async function joinGame() {
-      const nameInput = document.getElementById("nameInput");
-      playerName = nameInput.value.trim();
+      const mssvInput = document.getElementById("mssvInput");
+      playerMSSV = mssvInput.value.trim();
 
-      if (!playerName) {
+      if (!playerMSSV) {
         alert("Vui lòng nhập MSSV của bạn");
         return;
       }
@@ -427,16 +362,16 @@
         const res = await fetch(`${API_BASE}/join`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ playerId, name: playerName }),
+          body: JSON.stringify({ playerId, name: playerMSSV }),
         });
 
         if (res.ok) {
-          localStorage.setItem("playerName", playerName);
+          localStorage.setItem("playerMSSV", playerMSSV);
           hasJoined = true;
-          document.getElementById("nameInput").disabled = true;
+          mssvInput.disabled = true;
           document.querySelector(".lobby-form button").disabled = true;
-          document.getElementById("lobbyStatus").textContent = `✅ Đã tham gia. MSSV: ${playerName}`;
-          startPolling();
+          document.getElementById("lobbyStatus").textContent = `✅ Đã tham gia. MSSV: ${playerMSSV}`;
+          showWriting();
         } else {
           alert("Lỗi tham gia game");
         }
@@ -445,72 +380,16 @@
       }
     }
 
-    function startPolling() {
-      setInterval(pollPhase, 1500);
-    }
-
-    async function pollPhase() {
-      try {
-        const res = await fetch(`${API_BASE}/phase`);
-        const data = await res.json();
-
-        gameState = data;
-
-        // Always show lobby if not joined yet
-        if (!hasJoined) {
-          showSection("lobbySection");
-          return;
-        }
-
-        if (data.phase === "lobby") {
-          showSection("lobbySection");
-        } else if (data.phase === "writing") {
-          showSection("writingSection");
-          if (!jobTitle) {
-            await assignJobTitle();
-          }
-          updateCountdown("writingCountdown", data.deadline);
-        } else if (data.phase === "voting") {
-          showSection("votingSection");
-          updateCountdown("votingCountdown", data.deadline);
-          loadNextCard();
-        } else if (data.phase === "results") {
-          showSection("resultsSection");
-          loadResults();
-        }
-      } catch (err) {
-        console.error("Poll phase error:", err);
-      }
-    }
-
-    function showSection(sectionId) {
-      document.querySelectorAll(".section").forEach((s) => {
-        s.classList.remove("active");
-      });
-      document.getElementById(sectionId).classList.add("active");
-    }
-
-    async function assignJobTitle() {
-      try {
-        const res = await fetch(`${API_BASE}/resume/assign`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ playerId }),
-        });
-
-        const data = await res.json();
-        jobTitle = data.jobTitle;
-        document.getElementById("jobTitleDisplay").textContent = `📋 Vị trí: ${jobTitle}`;
-      } catch (err) {
-        alert(`Lỗi gán vị trí: ${err.message}`);
-      }
+    function showWriting() {
+      document.getElementById("playerDisplay").textContent = `MSSV: ${playerMSSV}`;
+      showSection("writingSection");
     }
 
     async function submitResume() {
       const resumeText = document.getElementById("resumeText").value.trim();
 
       if (!resumeText) {
-        alert("Vui lòng viết resume");
+        alert("Vui lòng viết CV");
         return;
       }
 
@@ -524,24 +403,34 @@
         const res = await fetch(`${API_BASE}/resume/submit`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ playerId, jobTitle, text: resumeText }),
+          body: JSON.stringify({ playerId, text: resumeText }),
         });
 
         if (res.ok) {
+          const data = await res.json();
           resumeSubmitted = true;
           btn.textContent = "✅ Đã nộp";
-          document.getElementById("writingStatus").textContent = "Đã nộp resume. Chờ mọi người...";
+          document.getElementById("writingStatus").textContent = `Đã nộp CV. Hệ thống sinh ${data.aiCount} phiên bản AI...`;
           document.getElementById("resumeText").disabled = true;
+
+          // Delay slightly before moving to voting
+          setTimeout(showVoting, 1500);
         } else {
           btn.disabled = false;
-          btn.textContent = "Nộp Resume";
-          alert("Lỗi nộp resume");
+          btn.textContent = "Nộp CV";
+          alert("Lỗi nộp CV");
         }
       } catch (err) {
         btn.disabled = false;
-        btn.textContent = "Nộp Resume";
+        btn.textContent = "Nộp CV";
         alert(`Lỗi: ${err.message}`);
       }
+    }
+
+    function showVoting() {
+      document.getElementById("playerDisplay2").textContent = `MSSV: ${playerMSSV}`;
+      showSection("votingSection");
+      loadNextCard();
     }
 
     async function loadNextCard() {
@@ -551,28 +440,47 @@
 
         if (data.done) {
           document.getElementById("votingContent").innerHTML = `
-            <div class="voting-done">
+            <div class="voting-waiting">
               <h2>✅ Bạn đã xong!</h2>
-              <p>Cảm ơn bạn đã tham gia. Chờ mọi người hoàn thành...</p>
+              <p class="pulse">⏳ Chờ mọi người hoàn thành vote...</p>
+              <p style="margin-top: 20px; color: var(--muted); font-size: 14px;">
+                Host sẽ chiếu kết quả trên màn hình lớn
+              </p>
             </div>
           `;
+          // Poll every 2s to see if new resumes available
+          setTimeout(checkForMoreResumes, 2000);
           return;
         }
 
         const resumeId = data.resumeId;
         const cardHtml = `
           <div class="card">
-            <div class="card-job">${data.jobTitle}</div>
             <div class="card-text">${data.text}</div>
             <div class="card-actions">
-              <button class="btn-hire" onclick="vote('${resumeId}', 'hire')">✅ Hire</button>
-              <button class="btn-reject" onclick="vote('${resumeId}', 'reject')">❌ Reject</button>
+              <button class="btn-hire" onclick="vote('${resumeId}', 'hire')">✅ Nhận</button>
+              <button class="btn-reject" onclick="vote('${resumeId}', 'reject')">❌ Từ chối</button>
             </div>
           </div>
         `;
         document.getElementById("votingContent").innerHTML = cardHtml;
       } catch (err) {
         console.error("Load card error:", err);
+      }
+    }
+
+    async function checkForMoreResumes() {
+      try {
+        const res = await fetch(`${API_BASE}/vote/next?playerId=${playerId}`);
+        const data = await res.json();
+
+        if (!data.done) {
+          loadNextCard();
+        } else {
+          setTimeout(checkForMoreResumes, 2000);
+        }
+      } catch (err) {
+        console.error("Check error:", err);
       }
     }
 
@@ -597,49 +505,21 @@
       }
     }
 
-    async function loadResults() {
-      try {
-        const res = await fetch(`${API_BASE}/results`);
-        const data = await res.json();
-
-        const aiRate = data.aiTotal > 0 ? data.aiHireRate : 0;
-        const humanRate = data.humanTotal > 0 ? data.humanHireRate : 0;
-
-        document.getElementById("aiRate").textContent = `${aiRate}%`;
-        document.getElementById("aiFill").style.width = `${aiRate}%`;
-        document.getElementById("aiStats").textContent = `${data.aiHire} Hire / ${data.aiReject} Reject (tổng ${data.aiTotal})`;
-
-        document.getElementById("humanRate").textContent = `${humanRate}%`;
-        document.getElementById("humanFill").style.width = `${humanRate}%`;
-        document.getElementById("humanStats").textContent = `${data.humanHire} Hire / ${data.humanReject} Reject (tổng ${data.humanTotal})`;
-      } catch (err) {
-        console.error("Load results error:", err);
-      }
+    function showSection(sectionId) {
+      document.querySelectorAll(".section").forEach((s) => {
+        s.classList.remove("active");
+      });
+      document.getElementById(sectionId).classList.add("active");
     }
 
-    function updateCountdown(elementId, deadline) {
-      if (!deadline) return;
-
-      const update = () => {
-        const now = Date.now();
-        const remaining = Math.max(0, deadline - now);
-        const seconds = Math.floor(remaining / 1000);
-        const minutes = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-
-        document.getElementById(elementId).textContent = `⏱️ ${minutes}:${secs.toString().padStart(2, "0")}`;
-
-        if (remaining > 0) {
-          setTimeout(update, 100);
-        }
-      };
-
-      update();
-    }
-
-    // Initialize on load
+    // Initialize
     window.addEventListener("load", () => {
-      pollPhase();
+      if (!hasJoined) {
+        showSection("lobbySection");
+      } else {
+        // Already joined in previous session
+        showWriting();
+      }
     });
   </script>
 </body>

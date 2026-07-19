@@ -26,35 +26,32 @@ export default async function handler(req, res) {
     let queue = await redis.lrange(`vote:${playerId}:queue`, 0, -1);
 
     if (!queue || queue.length === 0) {
-      // First time: build queue
-      const jobTitles = await redis.smembers("resumes:allJobTitles");
-      if (!jobTitles || jobTitles.length === 0) {
+      // First time: build queue from human + AI resumes
+      const humanIds = await redis.smembers("resumes:human");
+      const aiIds = await redis.smembers("resumes:ai");
+
+      if ((!humanIds || humanIds.length === 0) && (!aiIds || aiIds.length === 0)) {
         return res.status(200).json({
           done: true,
-          message: "No resumes available yet",
+          message: "Chưa có resume nào. Chờ mọi người viết...",
         });
       }
 
-      // Expand to [jobTitle::human, jobTitle::ai] pairs and shuffle
+      // Build list of all resumes
       let allResumes = [];
-      for (const jobTitle of jobTitles) {
-        allResumes.push(`${jobTitle}::human`);
-        allResumes.push(`${jobTitle}::ai`);
+      if (humanIds) {
+        allResumes = allResumes.concat(humanIds.map((id) => `human:${id}`));
+      }
+      if (aiIds) {
+        allResumes = allResumes.concat(aiIds.map((id) => `ai:${id}`));
       }
 
-      // Shuffle using a seed based on playerId (reproducible per player)
-      const seed = playerId
-        .split("")
-        .reduce((s, c) => s + c.charCodeAt(0), 0);
+      // Shuffle using seed based on playerId
+      const seed = playerId.split("").reduce((s, c) => s + c.charCodeAt(0), 0);
       allResumes = shuffleWithSeed(allResumes, seed);
 
-      // Remove player's own resume
-      const playerJobTitle = await redis.get(`player:${playerId}:jobTitle`);
-      if (playerJobTitle) {
-        allResumes = allResumes.filter(
-          (r) => r !== `${playerJobTitle}::human`
-        );
-      }
+      // Remove player's own resume if exists
+      allResumes = allResumes.filter((r) => r !== `human:${playerId}`);
 
       // Build queue in Redis
       if (allResumes.length > 0) {
@@ -73,25 +70,27 @@ export default async function handler(req, res) {
     }
 
     const resumeId = queue[0];
-    const [jobTitle, type] = resumeId.split("::");
+    const [type, id] = resumeId.split(":");
 
-    // Check if already voted on this
+    // Check if already voted
     const seen = await redis.sismember(`vote:${playerId}:seen`, resumeId);
     if (seen) {
       // Skip and fetch next
       await redis.lpop(`vote:${playerId}:queue`);
-      return handler(req, res); // Recursive call to get next unvoted
+      return handler(req, res); // Recursive
     }
 
     // Fetch resume text
-    const resumeData = await redis.hgetall(
-      `resume:${jobTitle}:${type}`
-    );
+    let resumeData;
+    if (type === "human") {
+      resumeData = await redis.hgetall(`resume:human:${id}`);
+    } else {
+      resumeData = await redis.hgetall(`resume:ai:${id}`);
+    }
 
     return res.status(200).json({
       done: false,
       resumeId,
-      jobTitle,
       text: resumeData?.text || "[Không tìm thấy dữ liệu resume]",
     });
   } catch (err) {

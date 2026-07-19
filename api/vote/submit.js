@@ -19,11 +19,7 @@ export default async function handler(req, res) {
     const { playerId, resumeId, decision } = req.body;
 
     if (!playerId || !resumeId || !decision) {
-      return res
-        .status(400)
-        .json({
-          error: "playerId, resumeId, decision (hire|reject) required",
-        });
+      return res.status(400).json({ error: "playerId, resumeId, decision required" });
     }
 
     if (!["hire", "reject"].includes(decision)) {
@@ -33,10 +29,7 @@ export default async function handler(req, res) {
     const redis = getRedisClient();
 
     // Check if already voted
-    const alreadyVoted = await redis.sismember(
-      `vote:${playerId}:seen`,
-      resumeId
-    );
+    const alreadyVoted = await redis.sismember(`vote:${playerId}:seen`, resumeId);
     if (alreadyVoted) {
       return res.status(409).json({ error: "Already voted on this resume" });
     }
@@ -48,14 +41,12 @@ export default async function handler(req, res) {
     await redis.lpop(`vote:${playerId}:queue`);
 
     // Increment counters
-    const [jobTitle, type] = resumeId.split("::");
+    const [type, id] = resumeId.split(":");
     const isAI = type === "ai";
-    const prefix = isAI ? "ai" : "human";
+    const decisionKey = decision === "hire" ? "Hire" : "Reject";
 
-    await redis.incr(`votes:global:${prefix}${decision === "hire" ? "Hire" : "Reject"}`);
-    await redis.incr(
-      `votes:${resumeId}:${decision === "hire" ? "hire" : "reject"}`
-    );
+    await redis.incr(`votes:global:${type}${decisionKey}`);
+    await redis.incr(`votes:${resumeId}:${decision}`);
 
     return res.status(200).json({ ok: true });
   } catch (err) {

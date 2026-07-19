@@ -18,9 +18,7 @@ export default async function handler(req, res) {
     const redis = getRedisClient();
 
     // Fetch all vote counters
-    const aiHire = parseInt(
-      (await redis.get("votes:global:aiHire")) || "0"
-    );
+    const aiHire = parseInt((await redis.get("votes:global:aiHire")) || "0");
     const aiReject = parseInt(
       (await redis.get("votes:global:aiReject")) || "0"
     );
@@ -34,11 +32,20 @@ export default async function handler(req, res) {
     const aiTotal = aiHire + aiReject;
     const humanTotal = humanHire + humanReject;
 
-    const aiHireRate = aiTotal > 0 ? ((aiHire / aiTotal) * 100).toFixed(1) : 0;
+    const aiHireRate =
+      aiTotal > 0 ? ((aiHire / aiTotal) * 100).toFixed(1) : 0;
     const humanHireRate =
       humanTotal > 0 ? ((humanHire / humanTotal) * 100).toFixed(1) : 0;
 
     const totalVotes = aiTotal + humanTotal;
+
+    // Get player and resume counts
+    const playerKeys = await redis.keys("player:*:name");
+    const playerCount = playerKeys ? playerKeys.length : 0;
+    const humanResumes = await redis.smembers("resumes:human");
+    const aiResumes = await redis.smembers("resumes:ai");
+    const humanCount = humanResumes ? humanResumes.length : 0;
+    const aiCount = aiResumes ? aiResumes.length : 0;
 
     return res.status(200).json({
       aiHire,
@@ -50,6 +57,9 @@ export default async function handler(req, res) {
       humanTotal,
       humanHireRate: parseFloat(humanHireRate),
       totalVotes,
+      playerCount,
+      humanCount,
+      aiCount,
     });
   } catch (err) {
     console.error("[results.js]", err.message);
