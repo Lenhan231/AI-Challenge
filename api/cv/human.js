@@ -25,7 +25,7 @@ export default async function handler(req, res) {
       for (const playerId of playerIds) {
         const cvData = await redis.hgetall(`resume:human:${playerId}`);
         if (cvData) {
-          resumes.push(cvData);
+          resumes.push({ playerId, ...cvData });
         }
       }
     }

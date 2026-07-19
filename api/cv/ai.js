@@ -25,7 +25,7 @@ export default async function handler(req, res) {
       for (const index of aiIndices) {
         const cvData = await redis.hgetall(`resume:ai:${index}`);
         if (cvData) {
-          resumes.push(cvData);
+          resumes.push({ id: index, ...cvData });
         }
       }
     }

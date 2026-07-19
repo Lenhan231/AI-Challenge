@@ -449,7 +449,7 @@
                 <strong>${cv.playerName || "Ẩn danh"}</strong>
                 <p style='white-space: pre-wrap; font-size: 13px; color: var(--muted); margin: 8px 0 0 0;'>${cv.text.substring(0, 200)}...</p>
               </div>
-              <button onclick="deleteCV('human', '${cv.playerName || idx}')" style='background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 10px; white-space: nowrap;'>Delete</button>
+              <button onclick="deleteCV('human', '${cv.playerId}')" style='background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 10px; white-space: nowrap;'>Delete</button>
             </div>`;
           });
         } else {
@@ -466,7 +466,7 @@
                 <strong>AI Resume #${idx + 1}</strong>
                 <p style='white-space: pre-wrap; font-size: 13px; color: var(--muted); margin: 8px 0 0 0;'>${cv.text.substring(0, 200)}...</p>
               </div>
-              <button onclick="deleteCV('ai', '${idx}')" style='background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 10px; white-space: nowrap;'>Delete</button>
+              <button onclick="deleteCV('ai', '${cv.id}')" style='background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 10px; white-space: nowrap;'>Delete</button>
             </div>`;
           });
         } else {
