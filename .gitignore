@@ -8,3 +8,4 @@ node_modules/
 test.py
 test-api.js
 test-groq.py
+.vercel_key
