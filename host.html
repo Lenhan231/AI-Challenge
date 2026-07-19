@@ -444,10 +444,12 @@
         html += "<div><h3 style='color: var(--warning); margin-top: 0;'>👤 CV Người Viết (" + (humanKeys.resumes?.length || 0) + ")</h3>";
         if (humanKeys.resumes && humanKeys.resumes.length > 0) {
           humanKeys.resumes.forEach((cv, idx) => {
+            const votes = `✅ ${cv.hireCount} | ❌ ${cv.rejectCount}`;
             html += `<div style='background: var(--bg); padding: 12px; margin-bottom: 12px; border-radius: 6px; border-left: 3px solid var(--warning); display: flex; justify-content: space-between; align-items: start;'>
               <div style='flex: 1;'>
                 <strong>${cv.playerName || "Ẩn danh"}</strong>
                 <p style='white-space: pre-wrap; font-size: 13px; color: var(--muted); margin: 8px 0 0 0;'>${cv.text.substring(0, 200)}...</p>
+                <p style='font-size: 12px; color: var(--success); margin: 6px 0 0 0;'>Vote: ${votes}</p>
               </div>
               <button onclick="deleteCV('human', '${cv.playerId}')" style='background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 10px; white-space: nowrap;'>Delete</button>
             </div>`;
@@ -461,10 +463,12 @@
         html += "<div><h3 style='color: var(--accent); margin-top: 0;'>🤖 CV AI (" + (aiKeys.resumes?.length || 0) + ")</h3>";
         if (aiKeys.resumes && aiKeys.resumes.length > 0) {
           aiKeys.resumes.forEach((cv, idx) => {
+            const votes = `✅ ${cv.hireCount} | ❌ ${cv.rejectCount}`;
             html += `<div style='background: var(--bg); padding: 12px; margin-bottom: 12px; border-radius: 6px; border-left: 3px solid var(--accent); display: flex; justify-content: space-between; align-items: start;'>
               <div style='flex: 1;'>
                 <strong>AI Resume #${idx + 1}</strong>
                 <p style='white-space: pre-wrap; font-size: 13px; color: var(--muted); margin: 8px 0 0 0;'>${cv.text.substring(0, 200)}...</p>
+                <p style='font-size: 12px; color: var(--accent); margin: 6px 0 0 0;'>Vote: ${votes}</p>
               </div>
               <button onclick="deleteCV('ai', '${cv.id}')" style='background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-left: 10px; white-space: nowrap;'>Delete</button>
             </div>`;

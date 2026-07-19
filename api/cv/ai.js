@@ -25,7 +25,11 @@ export default async function handler(req, res) {
       for (const index of aiIndices) {
         const cvData = await redis.hgetall(`resume:ai:${index}`);
         if (cvData) {
-          resumes.push({ id: index, ...cvData });
+          const resumeId = `ai:${index}`;
+          const hireCount = await redis.get(`votes:${resumeId}:hire`) || "0";
+          const rejectCount = await redis.get(`votes:${resumeId}:reject`) || "0";
+          const totalVotes = parseInt(hireCount) + parseInt(rejectCount);
+          resumes.push({ id: index, ...cvData, hireCount, rejectCount, totalVotes });
         }
       }
     }
