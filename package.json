@@ -1,0 +1,14 @@
+{
+  "type": "module",
+  "name": "ai-resume-game",
+  "version": "1.0.0",
+  "description": "Interactive classroom game: AI vs Human resumes",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.28.0"
+  }
+}

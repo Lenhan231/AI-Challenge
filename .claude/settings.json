@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(artifact-design)",
+      "Skill(artifact-design:*)",
+      "Bash(cd \"c:\\\\Users\\\\nhanl\\\\OneDrive\\\\Desktop\\\\AI-Challenge\" && rm -f index.html day-chuyen-du-bi.html && ls -la *.html 2>/dev/null || echo \"Cũ hết rồi\")"
+    ]
+  }
+}

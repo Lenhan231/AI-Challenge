@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Host Control — AI Tuyển Dụng</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --accent: #3b82f6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1024px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 20px;
+      background: var(--surface);
+      border-radius: 12px;
+      border: 2px solid var(--accent);
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: bold;
+      margin: 0 0 8px 0;
+    }
+
+    .header p {
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .status-box {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--accent);
+    }
+
+    .status-label {
+      font-size: 14px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .status-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--accent);
+    }
+
+    .phase-indicator {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: bold;
+      margin-left: 12px;
+      background: rgba(59, 130, 246, 0.2);
+      color: var(--accent);
+    }
+
+    .phase-indicator.writing {
+      background: rgba(59, 130, 246, 0.2);
+      color: var(--accent);
+    }
+
+    .phase-indicator.voting {
+      background: rgba(34, 197, 94, 0.2);
+      color: var(--success);
+    }
+
+    .phase-indicator.results {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--warning);
+    }
+
+    .controls {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .control-group {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      flex: 1;
+    }
+
+    .btn-primary:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+      flex: 1;
+    }
+
+    .btn-success:hover {
+      background: #059669;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-warning {
+      background: var(--warning);
+      color: #000;
+      flex: 1;
+    }
+
+    .btn-warning:hover {
+      background: #d97706;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .input-group input {
+      padding: 10px 12px;
+      border: 1px solid var(--muted);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      width: 100px;
+    }
+
+    .input-group label {
+      font-size: 14px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 16px;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .stat-card h3 {
+      font-size: 14px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 0 0 8px 0;
+    }
+
+    .stat-card .value {
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--accent);
+      margin: 0;
+    }
+
+    .timer {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--warning);
+      min-width: 100px;
+      text-align: center;
+    }
+
+    .log {
+      background: var(--bg);
+      border: 1px solid var(--muted);
+      border-radius: 8px;
+      padding: 16px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .log-entry {
+      margin: 4px 0;
+      color: var(--text);
+    }
+
+    .log-entry.success {
+      color: var(--success);
+    }
+
+    .log-entry.warning {
+      color: var(--warning);
+    }
+
+    .log-entry.error {
+      color: var(--danger);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎮 Host Control Panel</h1>
+      <p>Điều khiển trò chơi AI Tuyển Dụng</p>
+    </div>
+
+    <!-- Current Status -->
+    <div class="status-box">
+      <div class="status-label">Trạng thái hiện tại</div>
+      <div class="status-value">
+        <span id="currentPhase">Lobby</span>
+        <span class="phase-indicator" id="phaseIndicator"></span>
+      </div>
+      <div style="margin-top: 12px; color: var(--muted);">
+        Deadline: <span id="deadline">—</span> | Thời gian còn lại: <span class="timer" id="timer">—</span>
+      </div>
+    </div>
+
+    <!-- Real-time Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Người chơi</h3>
+        <p class="value" id="playerCount">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Resumes (AI + Human)</h3>
+        <p class="value" id="resumeCount">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Tổng votes</h3>
+        <p class="value" id="voteCount">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>AI Hire Rate</h3>
+        <p class="value" id="aiHireRate">—</p>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <div class="control-group">
+        <button class="btn-primary" onclick="advancePhase('writing')">
+          ✍️ Bắt đầu Viết (2p)
+        </button>
+      </div>
+      <div class="control-group">
+        <button class="btn-success" onclick="advancePhase('voting')">
+          🗳️ Bắt đầu Vote (8p)
+        </button>
+      </div>
+      <div class="control-group">
+        <button class="btn-warning" onclick="advancePhase('results')">
+          📊 Xem Kết Quả
+        </button>
+      </div>
+      <div class="control-group">
+        <button class="btn-danger" onclick="resetGame()">
+          🔄 Reset Game
+        </button>
+        <div class="input-group" style="margin-left: auto;">
+          <label for="customDuration">Custom duration (sec):</label>
+          <input type="number" id="customDuration" value="" min="10" max="600">
+          <button class="btn-primary" onclick="advancePhaseCustom()" style="flex: 0;">Apply</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Activity Log -->
+    <div style="margin-top: 30px;">
+      <h3>Activity Log</h3>
+      <div class="log" id="log"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "/api";
+    let currentPhase = "lobby";
+    let pollInterval;
+
+    async function advancePhase(phase) {
+      try {
+        const res = await fetch(`${API_BASE}/host/advance`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ toPhase: phase }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          log(`✅ Chuyển sang pha: ${phase}`, "success");
+          currentPhase = phase;
+          pollStatus();
+        } else {
+          log("❌ Lỗi chuyển pha", "error");
+        }
+      } catch (err) {
+        log(`❌ ${err.message}`, "error");
+      }
+    }
+
+    async function advancePhaseCustom() {
+      const durationInput = document.getElementById("customDuration");
+      const durationSec = parseInt(durationInput.value);
+
+      if (!durationSec || durationSec < 10) {
+        alert("Nhập thời gian hợp lệ (tối thiểu 10 giây)");
+        return;
+      }
+
+      const phases = ["writing", "voting", "results"];
+      const nextPhase = phases[(phases.indexOf(currentPhase) + 1) % phases.length];
+
+      try {
+        const res = await fetch(`${API_BASE}/host/advance`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ toPhase: nextPhase, durationSec }),
+        });
+
+        if (res.ok) {
+          log(`✅ Chuyển sang pha: ${nextPhase} (${durationSec}s)`, "success");
+          currentPhase = nextPhase;
+          pollStatus();
+        } else {
+          log("❌ Lỗi chuyển pha", "error");
+        }
+      } catch (err) {
+        log(`❌ ${err.message}`, "error");
+      }
+    }
+
+    async function resetGame() {
+      if (confirm("Bạn có chắc muốn reset toàn bộ game? (không thể hoàn tác)")) {
+        try {
+          // In a real implementation, would have a reset endpoint
+          // For now, just advance to lobby
+          const res = await fetch(`${API_BASE}/host/advance`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ toPhase: "lobby" }),
+          });
+
+          if (res.ok) {
+            log("✅ Game đã reset", "success");
+            currentPhase = "lobby";
+            pollStatus();
+          }
+        } catch (err) {
+          log(`❌ ${err.message}`, "error");
+        }
+      }
+    }
+
+    async function pollStatus() {
+      try {
+        // Get phase
+        const phaseRes = await fetch(`${API_BASE}/phase`);
+        const phaseData = await phaseRes.json();
+
+        document.getElementById("currentPhase").textContent =
+          phaseData.phase.charAt(0).toUpperCase() + phaseData.phase.slice(1);
+        document.getElementById("phaseIndicator").textContent = phaseData.phase;
+        document.getElementById("phaseIndicator").className =
+          `phase-indicator ${phaseData.phase}`;
+
+        if (phaseData.deadline) {
+          updateTimer(phaseData.deadline);
+        } else {
+          document.getElementById("timer").textContent = "—";
+        }
+
+        // Get results for stats
+        const resultsRes = await fetch(`${API_BASE}/results`);
+        const resultsData = await resultsRes.json();
+
+        document.getElementById("voteCount").textContent = resultsData.totalVotes;
+        const aiRate =
+          resultsData.aiTotal > 0 ? resultsData.aiHireRate.toFixed(1) : "—";
+        document.getElementById("aiHireRate").textContent = `${aiRate}%`;
+      } catch (err) {
+        console.error("Poll error:", err);
+      }
+    }
+
+    function updateTimer(deadline) {
+      const remaining = Math.max(0, deadline - Date.now());
+      const seconds = Math.floor(remaining / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+
+      document.getElementById("timer").textContent = `${minutes}:${secs
+        .toString()
+        .padStart(2, "0")}`;
+      document.getElementById("deadline").textContent = new Date(
+        deadline
+      ).toLocaleTimeString("vi-VN");
+    }
+
+    function log(message, type = "info") {
+      const logEl = document.getElementById("log");
+      const entry = document.createElement("div");
+      entry.className = `log-entry ${type}`;
+      entry.textContent = `[${new Date().toLocaleTimeString("vi-VN")}] ${message}`;
+      logEl.appendChild(entry);
+      logEl.scrollTop = logEl.scrollHeight;
+
+      if (logEl.children.length > 50) {
+        logEl.removeChild(logEl.firstChild);
+      }
+    }
+
+    // Poll every 1 second
+    window.addEventListener("load", () => {
+      pollStatus();
+      setInterval(pollStatus, 1000);
+      log("✅ Host panel khởi động", "success");
+    });
+  </script>
+</body>
+</html>
