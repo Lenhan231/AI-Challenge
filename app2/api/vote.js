@@ -27,34 +27,56 @@ export default async function handler(req, res) {
       let queue = await redis.lrange(`vote:${playerId}:queue`, 0, -1);
 
       if (!queue || queue.length === 0) {
-        // First time - create shuffled queue
+        // First time - select 4 random AI + 4 random human resumes
         const humanIds = await redis.smembers("resumes:human");
         const aiIds = await redis.smembers("resumes:ai");
 
-        const allIds = [];
-        if (humanIds) {
-          humanIds.forEach(id => allIds.push(`human:${id}`));
-        }
-        if (aiIds) {
-          aiIds.forEach(id => allIds.push(`ai:${id}`));
-        }
-
-        // Shuffle with seeded random (per playerId)
-        const seed = playerId.charCodeAt(0);
-        allIds.sort(() => (Math.sin(seed++) - 0.5) * 1.5);
-
         // Remove player's own resume
-        const ownResumeId = `human:${playerId}`;
-        const filteredIds = allIds.filter(id => id !== ownResumeId);
+        const ownResumeId = playerId;
+        const filteredHumanIds = humanIds ? humanIds.filter(id => id !== ownResumeId) : [];
+        const filteredAiIds = aiIds || [];
+
+        // Shuffle helper
+        const seededShuffle = (arr, seed) => {
+          const shuffled = [...arr];
+          for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor((Math.sin(seed++) * 10000) % (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+          }
+          return shuffled;
+        };
+
+        // Pick 4 random human resumes
+        const humanSeed = playerId.charCodeAt(0);
+        const shuffledHuman = seededShuffle(filteredHumanIds, humanSeed);
+        const selected4Human = shuffledHuman.slice(0, 4).map(id => `human:${id}`);
+
+        // Pick 4 random AI resumes
+        const aiSeed = playerId.charCodeAt(1) || 1;
+        const shuffledAi = seededShuffle(filteredAiIds, aiSeed);
+        const selected4Ai = shuffledAi.slice(0, 4).map(id => `ai:${id}`);
+
+        // Combine and shuffle final 8
+        const final8 = [...selected4Human, ...selected4Ai];
+        const finalSeed = playerId.charCodeAt(2) || 2;
+        const shuffledFinal = seededShuffle(final8, finalSeed);
 
         // Push to queue
-        if (filteredIds.length > 0) {
-          await redis.rpush(`vote:${playerId}:queue`, ...filteredIds);
+        if (shuffledFinal.length > 0) {
+          await redis.rpush(`vote:${playerId}:queue`, ...shuffledFinal);
         }
-        queue = filteredIds;
+        queue = shuffledFinal;
       }
 
-      // Get next unvoted resume
+      // Get voted count
+      const votedCount = await redis.scard(`vote:${playerId}:seen`) || 0;
+
+      // Check if player has voted on 8 resumes
+      if (votedCount >= 8) {
+        return res.status(200).json({ done: true, votedCount: 8, total: 8 });
+      }
+
+      // Get next unvoted resume from the fixed queue
       let resumeId;
       while (queue.length > 0) {
         resumeId = queue.shift();
@@ -63,7 +85,7 @@ export default async function handler(req, res) {
       }
 
       if (!resumeId) {
-        return res.status(200).json({ done: true });
+        return res.status(200).json({ done: true, votedCount, total: 8 });
       }
 
       // Get resume text
@@ -80,6 +102,8 @@ export default async function handler(req, res) {
         resumeId,
         text: cvData.text,
         done: false,
+        votedCount,
+        total: 8,
       });
     } catch (err) {
       console.error("[vote.js GET]", err.message);

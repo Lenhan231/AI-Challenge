@@ -338,6 +338,9 @@
       <div style="text-align: center; margin-bottom: 20px;">
         <div id="playerDisplay" style="color: var(--muted); font-size: 14px;"></div>
         <div class="timer" id="votingTimer">10:00</div>
+        <div style="color: var(--accent); font-size: 16px; font-weight: bold; margin-top: 12px;">
+          Đã chọn: <span id="voteProgress">0/8</span>
+        </div>
       </div>
       <div id="votingContent"></div>
     </div>
@@ -446,6 +449,11 @@
           console.error("API error:", data);
           setTimeout(loadNextCard, 1000); // Retry
           return;
+        }
+
+        // Update progress
+        if (data.votedCount !== undefined) {
+          document.getElementById("voteProgress").textContent = `${data.votedCount}/${data.total}`;
         }
 
         if (data.done) {
