@@ -406,10 +406,11 @@
       localStorage.setItem("playerId", playerId);
     }
 
-    let playerName = "";
+    let playerName = localStorage.getItem("playerName") || "";
     let gameState = { phase: "lobby", deadline: null, startedAt: null };
     let jobTitle = "";
     let resumeSubmitted = false;
+    let hasJoined = !!playerName;
 
     const API_BASE = "/api";
 
@@ -418,7 +419,7 @@
       playerName = nameInput.value.trim();
 
       if (!playerName) {
-        alert("Vui lòng nhập tên của bạn");
+        alert("Vui lòng nhập MSSV của bạn");
         return;
       }
 
@@ -430,9 +431,11 @@
         });
 
         if (res.ok) {
+          localStorage.setItem("playerName", playerName);
+          hasJoined = true;
           document.getElementById("nameInput").disabled = true;
           document.querySelector(".lobby-form button").disabled = true;
-          document.getElementById("lobbyStatus").textContent = `✅ Đã tham gia với tên: ${playerName}`;
+          document.getElementById("lobbyStatus").textContent = `✅ Đã tham gia. MSSV: ${playerName}`;
           startPolling();
         } else {
           alert("Lỗi tham gia game");
@@ -452,6 +455,12 @@
         const data = await res.json();
 
         gameState = data;
+
+        // Always show lobby if not joined yet
+        if (!hasJoined) {
+          showSection("lobbySection");
+          return;
+        }
 
         if (data.phase === "lobby") {
           showSection("lobbySection");
@@ -578,9 +587,12 @@
         if (res.ok) {
           loadNextCard();
         } else {
-          alert("Lỗi vote");
+          const errorData = await res.json();
+          console.error("Vote error:", errorData);
+          alert(`Lỗi vote: ${errorData.error || "unknown"}`);
         }
       } catch (err) {
+        console.error("Vote exception:", err);
         alert(`Lỗi: ${err.message}`);
       }
     }

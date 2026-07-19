@@ -438,7 +438,13 @@
           document.getElementById("timer").textContent = "—";
         }
 
-        // Get results for stats
+        // Get player & resume stats
+        const statsRes = await fetch(`${API_BASE}/stats`);
+        const statsData = await statsRes.json();
+        document.getElementById("playerCount").textContent = statsData.playerCount;
+        document.getElementById("resumeCount").textContent = statsData.resumeCount;
+
+        // Get results for voting stats
         const resultsRes = await fetch(`${API_BASE}/results`);
         const resultsData = await resultsRes.json();
 
