@@ -551,7 +551,7 @@
 
     async function loadNextCard() {
       try {
-        const res = await fetch(`${API_BASE}/vote/next?playerId=${playerId}`);
+        const res = await fetch(`${API_BASE}/vote?playerId=${playerId}`);
         const data = await res.json();
 
         if (data.done) {
@@ -587,7 +587,7 @@
 
     async function checkForMoreResumes() {
       try {
-        const res = await fetch(`${API_BASE}/vote/next?playerId=${playerId}`);
+        const res = await fetch(`${API_BASE}/vote?playerId=${playerId}`);
         const data = await res.json();
 
         if (!data.done) {
@@ -606,7 +606,7 @@
       buttons.forEach(btn => btn.disabled = true);
 
       try {
-        const res = await fetch(`${API_BASE}/vote/submit`, {
+        const res = await fetch(`${API_BASE}/vote`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ playerId, resumeId, decision }),
