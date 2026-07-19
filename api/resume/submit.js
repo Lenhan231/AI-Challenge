@@ -49,16 +49,16 @@ export default async function handler(req, res) {
 
     // Generate 1-3 AI resumes (random)
     const aiCount = Math.floor(Math.random() * 3) + 1; // 1-3
-    const apiKey = process.env.GROQ_API_KEY || process.env.GEMINI_API_KEY;
+    const geminiKey = process.env.GEMINI_API_KEY;
 
-    if (!apiKey) {
-      console.warn("[resume/submit] GROQ_API_KEY or GEMINI_API_KEY not set, skipping AI generation");
+    if (!geminiKey) {
+      console.warn("[resume/submit] GEMINI_API_KEY not set, skipping AI generation");
     } else {
       for (let i = 0; i < aiCount; i++) {
         // Try to generate AI resume
         try {
           const isQualityVariation = i % 2 === 1; // Alternate quality
-          const aiResult = await generateAIResume(GAME_JOB_TITLE, apiKey, isQualityVariation);
+          const aiResult = await generateAIResume(GAME_JOB_TITLE, geminiKey, isQualityVariation);
 
           // Store AI resume with unique index
           const aiIndex = await redis.incr("ai:resume:counter");
