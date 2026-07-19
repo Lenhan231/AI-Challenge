@@ -464,16 +464,15 @@
       modal.style.display = "block";
 
       try {
-        // Fetch human resumes
-        const humanKeys = await fetch(`${API_BASE}/cv/human`).then(r => r.json()).catch(() => ({ resumes: [] }));
-        const aiKeys = await fetch(`${API_BASE}/cv/ai`).then(r => r.json()).catch(() => ({ resumes: [] }));
+        // Fetch all resumes (consolidated endpoint)
+        const cvData = await fetch(`${API_BASE}/cv`).then(r => r.json()).catch(() => ({ human: [], ai: [] }));
 
         let html = "<div style='display: grid; grid-template-columns: 1fr 1fr; gap: 20px;'>";
 
         // Human CVs
-        html += "<div><h3 style='color: var(--warning); margin-top: 0;'>👤 CV Người Viết (" + (humanKeys.resumes?.length || 0) + ")</h3>";
-        if (humanKeys.resumes && humanKeys.resumes.length > 0) {
-          humanKeys.resumes.forEach((cv, idx) => {
+        html += "<div><h3 style='color: var(--warning); margin-top: 0;'>👤 CV Người Viết (" + (cvData.human?.length || 0) + ")</h3>";
+        if (cvData.human && cvData.human.length > 0) {
+          cvData.human.forEach((cv, idx) => {
             const votes = `✅ ${cv.hireCount} | ❌ ${cv.rejectCount}`;
             html += `<div style='background: var(--bg); padding: 12px; margin-bottom: 12px; border-radius: 6px; border-left: 3px solid var(--warning); display: flex; justify-content: space-between; align-items: start;'>
               <div style='flex: 1;'>
@@ -490,9 +489,9 @@
         html += "</div>";
 
         // AI CVs
-        html += "<div><h3 style='color: var(--accent); margin-top: 0;'>🤖 CV AI (" + (aiKeys.resumes?.length || 0) + ")</h3>";
-        if (aiKeys.resumes && aiKeys.resumes.length > 0) {
-          aiKeys.resumes.forEach((cv, idx) => {
+        html += "<div><h3 style='color: var(--accent); margin-top: 0;'>🤖 CV AI (" + (cvData.ai?.length || 0) + ")</h3>";
+        if (cvData.ai && cvData.ai.length > 0) {
+          cvData.ai.forEach((cv, idx) => {
             const votes = `✅ ${cv.hireCount} | ❌ ${cv.rejectCount}`;
             html += `<div style='background: var(--bg); padding: 12px; margin-bottom: 12px; border-radius: 6px; border-left: 3px solid var(--accent); display: flex; justify-content: space-between; align-items: start;'>
               <div style='flex: 1;'>
