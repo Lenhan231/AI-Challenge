@@ -287,6 +287,32 @@
       0%, 100% { opacity: 1; }
       50% { opacity: 0.5; }
     }
+
+    .timer {
+      text-align: center;
+      font-size: 48px;
+      font-weight: bold;
+      margin: 20px 0;
+      padding: 20px;
+      background: var(--bg);
+      border-radius: 12px;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 4px;
+    }
+
+    .timer.warning {
+      color: var(--warning);
+      animation: pulse 1s infinite;
+    }
+
+    .timer.danger {
+      color: var(--danger);
+      animation: pulse 0.5s infinite;
+    }
+
+    .timer.ok {
+      color: var(--success);
+    }
   </style>
 </head>
 <body>
@@ -316,8 +342,10 @@
         </div>
       </div>
 
+      <div class="timer" id="timerDisplay">02:00</div>
+
       <div class="instruction">
-        ✏️ Viết CV của bạn cho vị trí Nhân Viên May (150-300 từ)
+        ✏️ Viết CV của bạn cho vị trí Nhân Viên May (bạn có 2 phút để viết như con người thật)
       </div>
 
       <textarea id="resumeText" placeholder="Nhập CV của bạn tại đây..."></textarea>
@@ -348,6 +376,9 @@
 
     const API_BASE = "/api";
     const JOB_TITLE = "Nhân Viên May";
+    const WRITING_TIME = 120; // 2 minutes
+    let writingTimeLeft = WRITING_TIME;
+    let writingTimerInterval = null;
 
     async function joinGame() {
       const mssvInput = document.getElementById("mssvInput");
@@ -380,9 +411,49 @@
       }
     }
 
+    function startWritingTimer() {
+      writingTimeLeft = WRITING_TIME;
+      document.getElementById("resumeText").disabled = false;
+      document.getElementById("submitBtn").disabled = false;
+
+      if (writingTimerInterval) clearInterval(writingTimerInterval);
+
+      writingTimerInterval = setInterval(() => {
+        writingTimeLeft--;
+        const mins = Math.floor(writingTimeLeft / 60);
+        const secs = writingTimeLeft % 60;
+        const display = `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+        document.getElementById("timerDisplay").textContent = display;
+
+        const timer = document.getElementById("timerDisplay");
+        if (writingTimeLeft <= 10) {
+          timer.className = "timer danger";
+        } else if (writingTimeLeft <= 30) {
+          timer.className = "timer warning";
+        } else {
+          timer.className = "timer ok";
+        }
+
+        if (writingTimeLeft <= 0) {
+          clearInterval(writingTimerInterval);
+          document.getElementById("resumeText").disabled = true;
+          document.getElementById("submitBtn").disabled = true;
+          document.getElementById("writingStatus").textContent = "⏰ Hết giờ! Vui lòng chờ mọi người hoàn thành.";
+        }
+      }, 1000);
+    }
+
+    function stopWritingTimer() {
+      if (writingTimerInterval) {
+        clearInterval(writingTimerInterval);
+        writingTimerInterval = null;
+      }
+    }
+
     function showWriting() {
       document.getElementById("playerDisplay").textContent = `MSSV: ${playerMSSV}`;
       showSection("writingSection");
+      startWritingTimer();
     }
 
     async function submitResume() {
@@ -395,6 +466,7 @@
 
       if (resumeSubmitted) return;
 
+      stopWritingTimer();
       const btn = document.getElementById("submitBtn");
       btn.disabled = true;
       btn.textContent = "Đang nộp...";
@@ -428,6 +500,7 @@
     }
 
     function showVoting() {
+      stopWritingTimer();
       document.getElementById("playerDisplay2").textContent = `MSSV: ${playerMSSV}`;
       showSection("votingSection");
       loadNextCard();

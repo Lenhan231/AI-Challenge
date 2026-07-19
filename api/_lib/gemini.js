@@ -23,24 +23,22 @@ export async function generateAIResume(jobTitle, geminiKey, isQualityVariation =
 
   const groqKey = process.env.GROQ_API_KEY;
 
-  // Alternate between high-quality and lower-quality resumes
+  // Simulate a human resume written in ~2 minutes
   const qualityPrompt = isQualityVariation
-    ? `Viết một bản CV/Resume tiếng Việt cho vị trí "${jobTitle}" với chất lượng trung bình (150-200 từ).
-Format:
-- Tiêu đề: Tên vị trí
-- Thông tin cá nhân (3-4 dòng)
-- Kinh nghiệm (2 items)
-- Điểm mạnh (2-3 items)
+    ? `Viết một bản CV/Resume tiếng Việt cho vị trí "${jobTitle}" như thể một người viết nhanh trong 2 phút (80-120 từ).
+Format đơn giản:
+- Tên & thông tin cơ bản (1-2 dòng)
+- Kinh nghiệm (1-2 dòng)
+- Điểm mạnh (1 dòng)
 
-Viết realistic nhưng không quá chi tiết, có thể thiếu một số thông tin chuyên môn cụ thể.`
-    : `Viết một bản CV/Resume tiếng Việt ngắn gọn (150-200 từ) cho vị trí "${jobTitle}".
+Viết ngắn gọn, thiếu một số chi tiết, không quá formal nhưng vẫn có lý.`
+    : `Viết một bản CV/Resume tiếng Việt cho vị trí "${jobTitle}" như thể một người viết cẩn thận trong 2 phút (100-150 từ).
 Format:
-- Tiêu đề: Tên vị trí
-- Thông tin cá nhân (3-4 dòng)
-- Kinh nghiệm (2-3 items)
-- Điểm mạnh (3 items)
+- Tên, ngày sinh, liên hệ (2-3 dòng)
+- Kinh nghiệm chính (2-3 dòng)
+- Điểm mạnh (2 dòng)
 
-Hãy viết professional, chi tiết, không quá dài. Không thêm ghi chú hay phần cấu trúc.`;
+Viết professional nhưng simple, chỉ đủ thông tin cần thiết.`;
 
   try {
     const controller = new AbortController();
@@ -109,8 +107,8 @@ Hãy viết professional, chi tiết, không quá dài. Không thêm ghi chú ha
 
 async function generateViaGroq(jobTitle, groqKey, isQualityVariation) {
   const qualityPrompt = isQualityVariation
-    ? `Viết một bản CV/Resume tiếng Việt cho vị trí "${jobTitle}" với chất lượng trung bình (150-200 từ).`
-    : `Viết một bản CV/Resume tiếng Việt ngắn gọn (150-200 từ) cho vị trí "${jobTitle}".`;
+    ? `Viết một bản CV/Resume tiếng Việt cho vị trí "${jobTitle}" như thể một người viết nhanh trong 2 phút (80-120 từ). Viết ngắn gọn, thiếu chi tiết nhưng vẫn có lý.`
+    : `Viết một bản CV/Resume tiếng Việt cho vị trí "${jobTitle}" như thể một người viết cẩn thận trong 2 phút (100-150 từ). Viết professional nhưng simple.`;
 
   try {
     const controller = new AbortController();
@@ -123,7 +121,7 @@ async function generateViaGroq(jobTitle, groqKey, isQualityVariation) {
         Authorization: `Bearer ${groqKey}`,
       },
       body: JSON.stringify({
-        model: "mixtral-8x7b-32768",
+        model: "openai/gpt-oss-120b",
         messages: [{ role: "user", content: qualityPrompt }],
         temperature: 0.7,
         max_tokens: 500,

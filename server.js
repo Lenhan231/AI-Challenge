@@ -142,14 +142,16 @@ const server = http.createServer((req, res) => {
   // Static files
   let urlPath = req.url.split("?")[0];
   if (urlPath === "/" || urlPath === "") urlPath = "/index.html";
+  if (urlPath === "/host") urlPath = "/host.html";
 
   const filePath = path.join(__dirname, urlPath);
   const ext = path.extname(filePath);
 
   fs.readFile(filePath, (err, data) => {
     if (err) {
-      // Fallback to index.html for SPA routing
-      fs.readFile(path.join(__dirname, "index.html"), (err2, data2) => {
+      // Fallback to index.html for SPA routing (but not for /host)
+      const fallbackFile = urlPath === "/host.html" ? "host.html" : "index.html";
+      fs.readFile(path.join(__dirname, fallbackFile), (err2, data2) => {
         if (err2) {
           res.writeHead(404);
           res.end("Not found");
