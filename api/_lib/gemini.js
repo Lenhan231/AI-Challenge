@@ -23,14 +23,15 @@ export async function generateAIResume(jobTitle, geminiKey, isQualityVariation =
 
   const groqKey = process.env.GROQ_API_KEY;
 
-  // Simulate a human resume written in ~2 minutes - very brief, vague
+  // Simulate a human resume written in ~2 minutes - skills & traits only, NO personal info
   const qualityPrompt = isQualityVariation
     ? `Viết một bản CV/Resume rất ngắn tiếng Việt cho vị trí "${jobTitle}" (40-60 từ).
-Viết như một người vội vàng, bỏ chi tiết cụ thể.
-Ví dụ: "Tên: [tên]. May công nghiệp 3 năm. Khéo léo, chịu áp lực tốt."`
+KHÔNG có thông tin cá nhân (tên, sinh năm, địa chỉ, điện thoại).
+CHỈ viết: kinh nghiệm, kỹ năng, tính cách, điểm mạnh.
+Ví dụ: "2 năm may công nghiệp. Thành thạo máy may, thêu. Cẩn thận, chịu áp lực."`
     : `Viết một bản CV/Resume ngắn tiếng Việt cho vị trí "${jobTitle}" (60-80 từ).
-Viết đơn giản, không thêm chi tiết như ngày sinh, địa chỉ đầy đủ.
-Chỉ cần: tên, kinh nghiệm, 1-2 kỹ năng chính.`;
+KHÔNG có thông tin cá nhân (tên, sinh năm, địa chỉ, điện thoại, email).
+CHỈ viết: kinh nghiệm làm việc, kỹ năng chuyên môn, tính cách, điểm đặc biệt.`;
 
   try {
     const controller = new AbortController();
@@ -99,8 +100,8 @@ Chỉ cần: tên, kinh nghiệm, 1-2 kỹ năng chính.`;
 
 async function generateViaGroq(jobTitle, groqKey, isQualityVariation) {
   const qualityPrompt = isQualityVariation
-    ? `Viết một bản CV/Resume rất ngắn tiếng Việt cho vị trí "${jobTitle}" (40-60 từ). Viết như vội vàng, bỏ chi tiết.`
-    : `Viết một bản CV/Resume ngắn tiếng Việt cho vị trí "${jobTitle}" (60-80 từ). Chỉ cần tên, kinh nghiệm, kỹ năng.`;
+    ? `Viết CV cho vị trí "${jobTitle}" (40-60 từ). Không có tên, sinh năm, địa chỉ. Chỉ: kinh nghiệm, kỹ năng, tính cách.`
+    : `Viết CV cho vị trí "${jobTitle}" (60-80 từ). Không có thông tin cá nhân. Chỉ: kinh nghiệm, kỹ năng, điểm mạnh.`;
 
   try {
     const controller = new AbortController();
