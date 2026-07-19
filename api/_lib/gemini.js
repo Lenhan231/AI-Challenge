@@ -15,13 +15,13 @@ KINH NGHIỆM LÀM VIỆC
 - Chịu áp lực công việc tốt
 - Giao tiếp hiệu quả với đồng đội`;
 
-export async function generateAIResume(jobTitle, geminiKey, isQualityVariation = false) {
-  if (!geminiKey) {
-    console.warn("[Gemini] API key not provided, using fallback");
+export async function generateAIResume(jobTitle, apiKey, isQualityVariation = false) {
+  if (!apiKey) {
+    console.warn("[AI] API key not provided, using fallback");
     return { text: FALLBACK_RESUME, fallback: true };
   }
 
-  // Alternate between high-quality and lower-quality resumes to add realism
+  // Alternate between high-quality and lower-quality resumes
   const qualityPrompt = isQualityVariation
     ? `Viết một bản CV/Resume tiếng Việt cho vị trí "${jobTitle}" với chất lượng trung bình (150-200 từ).
 Format:
@@ -40,51 +40,54 @@ Format:
 
 Hãy viết professional, chi tiết, không quá dài. Không thêm ghi chú hay phần cấu trúc.`;
 
-  const prompt = qualityPrompt;
-
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
 
-    console.log(`[Gemini] Requesting: ${jobTitle} (quality: ${isQualityVariation ? "medium" : "high"})`);
+    console.log(`[AI] Requesting via Groq: ${jobTitle} (quality: ${isQualityVariation ? "medium" : "high"})`);
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-        }),
-        signal: controller.signal,
-      }
-    );
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "mixtral-8x7b-32768", // Groq's fast model
+        messages: [
+          {
+            role: "user",
+            content: qualityPrompt,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 500,
+      }),
+      signal: controller.signal,
+    });
 
     clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error(
-        `[Gemini] API error ${response.status}: ${errorText.substring(0, 200)}`
+        `[AI] API error ${response.status}: ${errorText.substring(0, 200)}`
       );
       return { text: FALLBACK_RESUME, fallback: true };
     }
 
     const data = await response.json();
-    const text =
-      data.candidates?.[0]?.content?.parts?.map((p) => p.text).join("") || "";
+    const text = data.choices?.[0]?.message?.content?.trim() || "";
 
-    if (!text.trim()) {
-      console.warn("[Gemini] Empty response, fallback to generic resume");
+    if (!text) {
+      console.warn("[AI] Empty response, fallback to generic resume");
       return { text: FALLBACK_RESUME, fallback: true };
     }
 
-    console.log(`[Gemini] ✅ Generated resume for ${jobTitle}`);
-    return { text: text.trim(), fallback: false };
+    console.log(`[AI] ✅ Generated resume for ${jobTitle}`);
+    return { text, fallback: false };
   } catch (err) {
-    console.error(
-      `[Gemini] Error: ${err.message}`
-    );
+    console.error(`[AI] Error: ${err.message}`);
     return { text: FALLBACK_RESUME, fallback: true };
   }
 }
