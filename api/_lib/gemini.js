@@ -16,6 +16,11 @@ KINH NGHIỆM LÀM VIỆC
 - Giao tiếp hiệu quả với đồng đội`;
 
 export async function generateAIResume(jobTitle, geminiKey, isQualityVariation = false) {
+  if (!geminiKey) {
+    console.warn("[Gemini] API key not provided, using fallback");
+    return { text: FALLBACK_RESUME, fallback: true };
+  }
+
   // Alternate between high-quality and lower-quality resumes to add realism
   const qualityPrompt = isQualityVariation
     ? `Viết một bản CV/Resume tiếng Việt cho vị trí "${jobTitle}" với chất lượng trung bình (150-200 từ).
@@ -39,7 +44,9 @@ Hãy viết professional, chi tiết, không quá dài. Không thêm ghi chú ha
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 7000); // 7s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+    console.log(`[Gemini] Requesting: ${jobTitle} (quality: ${isQualityVariation ? "medium" : "high"})`);
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`,
@@ -56,8 +63,9 @@ Hãy viết professional, chi tiết, không quá dài. Không thêm ghi chú ha
     clearTimeout(timeoutId);
 
     if (!response.ok) {
+      const errorText = await response.text();
       console.error(
-        `[Gemini] API error: ${response.status}, fallback to generic resume`
+        `[Gemini] API error ${response.status}: ${errorText.substring(0, 200)}`
       );
       return { text: FALLBACK_RESUME, fallback: true };
     }
@@ -71,10 +79,11 @@ Hãy viết professional, chi tiết, không quá dài. Không thêm ghi chú ha
       return { text: FALLBACK_RESUME, fallback: true };
     }
 
+    console.log(`[Gemini] ✅ Generated resume for ${jobTitle}`);
     return { text: text.trim(), fallback: false };
   } catch (err) {
     console.error(
-      `[Gemini] Error: ${err.message}, fallback to generic resume`
+      `[Gemini] Error: ${err.message}`
     );
     return { text: FALLBACK_RESUME, fallback: true };
   }
