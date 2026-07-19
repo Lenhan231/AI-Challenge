@@ -299,16 +299,6 @@
       </div>
     </div>
 
-    <!-- Phase Controls -->
-    <div class="controls" style="margin-bottom: 20px;">
-      <button class="btn-primary" onclick="setPhase('writing')">✏️ Bắt đầu viết (Phase 1)</button>
-      <button class="btn-primary" onclick="setPhase('voting')">🗳️ Bắt đầu vote (Phase 2)</button>
-      <button class="btn-primary" onclick="setPhase('results')">📊 Xem kết quả</button>
-      <div style="color: var(--muted); font-size: 12px; margin-top: 8px;">
-        Hiện tại: <span id="currentPhase" style="color: var(--accent); font-weight: bold;">writing</span>
-      </div>
-    </div>
-
     <!-- Controls -->
     <div class="controls">
       <button class="btn-primary" onclick="showCVList()">📋 Xem CV</button>
@@ -337,25 +327,6 @@
   <script>
     const API_BASE = "/api";
 
-    async function setPhase(phase) {
-      try {
-        const res = await fetch(`${API_BASE}/phase`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phase }),
-        });
-
-        if (res.ok) {
-          document.getElementById("currentPhase").textContent =
-            phase === "writing" ? "Viết CV" : phase === "voting" ? "Vote" : "Kết quả";
-          log(`✅ Chuyển sang phase: ${phase}`, "success");
-        } else {
-          log("❌ Lỗi chuyển phase", "error");
-        }
-      } catch (err) {
-        log(`❌ ${err.message}`, "error");
-      }
-    }
 
     async function loadStats() {
       try {

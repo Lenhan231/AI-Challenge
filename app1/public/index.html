@@ -650,24 +650,6 @@
       document.getElementById(sectionId).classList.add("active");
     }
 
-    let currentPhase = "writing";
-
-    async function pollPhase() {
-      try {
-        const res = await fetch(`${API_BASE}/phase`);
-        const data = await res.json();
-        if (data.phase && data.phase !== currentPhase) {
-          currentPhase = data.phase;
-          // Host changed phase
-          if (currentPhase === "voting" && hasJoined && !resumeSubmitted) {
-            // Redirect to voting if still writing
-            showVoting();
-          }
-        }
-      } catch (err) {
-        // Ignore poll errors
-      }
-    }
 
     // Initialize
     window.addEventListener("load", () => {
@@ -677,8 +659,6 @@
         // Already joined in previous session
         showWriting();
       }
-      // Poll phase every 1.5 seconds
-      setInterval(pollPhase, 1500);
     });
   </script>
 </body>
