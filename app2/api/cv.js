@@ -28,7 +28,7 @@ export default async function handler(req, res) {
             const hireCount = await redis.get(`votes:${resumeId}:hire`) || "0";
             const rejectCount = await redis.get(`votes:${resumeId}:reject`) || "0";
             const totalVotes = parseInt(hireCount) + parseInt(rejectCount);
-            human.push({ playerId, ...cvData, hireCount, rejectCount, totalVotes });
+            human.push({ playerId, ...cvData, hire: hireCount, reject: rejectCount, totalVotes });
           }
         }
       }
@@ -42,7 +42,7 @@ export default async function handler(req, res) {
             const hireCount = await redis.get(`votes:${resumeId}:hire`) || "0";
             const rejectCount = await redis.get(`votes:${resumeId}:reject`) || "0";
             const totalVotes = parseInt(hireCount) + parseInt(rejectCount);
-            ai.push({ id: index, ...cvData, hireCount, rejectCount, totalVotes });
+            ai.push({ id: index, ...cvData, hire: hireCount, reject: rejectCount, totalVotes });
           }
         }
       }
