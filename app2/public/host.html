@@ -391,6 +391,124 @@
       font-size: 12px;
       margin-top: 24px;
     }
+
+    /* Analysis Section */
+    .analysis-section {
+      background: rgba(30, 41, 59, 0.6);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(245, 158, 11, 0.3);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 32px;
+    }
+
+    .analysis-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      text-align: center;
+      color: #f59e0b;
+    }
+
+    .winner-badge {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .winner-text {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .winner-text.ai {
+      color: #3b82f6;
+    }
+
+    .winner-text.human {
+      color: #f59e0b;
+    }
+
+    .winner-text.draw {
+      background: linear-gradient(135deg, #f59e0b 0%, #3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .lessons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .lessons {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .lesson-card {
+      background: rgba(15, 23, 42, 0.8);
+      border-left: 4px solid;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .lesson-card h4 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .lesson-card p {
+      font-size: 13px;
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .lesson-card.key {
+      border-left-color: #10b981;
+    }
+
+    .lesson-card.key h4 {
+      color: #10b981;
+    }
+
+    .lesson-card.warning {
+      border-left-color: #f59e0b;
+    }
+
+    .lesson-card.warning h4 {
+      color: #f59e0b;
+    }
+
+    .lesson-card.info {
+      border-left-color: #3b82f6;
+    }
+
+    .lesson-card.info h4 {
+      color: #3b82f6;
+    }
+
+    .conclusion {
+      background: rgba(59, 130, 246, 0.1);
+      border-left: 4px solid #3b82f6;
+      padding: 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      line-height: 1.7;
+      color: #cbd5e1;
+    }
+
+    .conclusion strong {
+      color: #3b82f6;
+    }
   </style>
 </head>
 <body>
@@ -465,6 +583,19 @@
       </div>
     </div>
 
+    <!-- Analysis Section -->
+    <div class="analysis-section">
+      <div class="analysis-title">📚 Phân Tích & Bài Học (Chương 6: CMCN 4.0 & Thất Nghiệp)</div>
+
+      <div class="winner-badge">
+        <div class="winner-text" id="winnerText">—</div>
+      </div>
+
+      <div class="lessons" id="lessonsContainer"></div>
+
+      <div class="conclusion" id="conclusionText"></div>
+    </div>
+
     <!-- Controls -->
     <div class="controls">
       <button type="button" class="btn-primary" onclick="showCVList()">📋 Xem Danh Sách CV</button>
@@ -513,8 +644,104 @@
         document.getElementById("humanFill").style.width = `${humanRate === "—" ? 0 : humanRate}%`;
         document.getElementById("humanHire").textContent = resultsData.humanHire;
         document.getElementById("humanReject").textContent = resultsData.humanReject;
+
+        // Analysis & Lessons
+        updateAnalysis(resultsData);
       } catch (err) {
         console.error("Load stats error:", err);
+      }
+    }
+
+    function updateAnalysis(data) {
+      const aiRate = data.aiTotal > 0 ? data.aiHireRate : 0;
+      const humanRate = data.humanTotal > 0 ? data.humanHireRate : 0;
+
+      let winner = "draw";
+      if (aiRate > humanRate + 5) winner = "ai";
+      else if (humanRate > aiRate + 5) winner = "human";
+
+      const winnerText = document.getElementById("winnerText");
+      const lessonsContainer = document.getElementById("lessonsContainer");
+      const conclusionText = document.getElementById("conclusionText");
+
+      if (winner === "ai") {
+        winnerText.innerHTML = `🤖 AI Thắng (${aiRate.toFixed(1)}% vs ${humanRate.toFixed(1)}%)`;
+        winnerText.className = "winner-text ai";
+
+        lessonsContainer.innerHTML = `
+          <div class="lesson-card warning">
+            <h4>⚠️ Rủi Ro Thất Nghiệp</h4>
+            <p>AI có thể học được mô hình tuyển dụng nhanh chóng, cho thấy nguy cơ tự động hóa ngành thâm dụng lao động như may, logistics.</p>
+          </div>
+          <div class="lesson-card key">
+            <h4>✅ Khách Quan Cao Hơn</h4>
+            <p>AI consistent và ít bị thiên vị cá nhân. Nhưng dữ liệu training có thể chứa bias từ xã hội (giới tính, tuổi tác).</p>
+          </div>
+          <div class="lesson-card warning">
+            <h4>📊 Ảnh Hưởng CMCN 4.0</h4>
+            <p>Công nghệ thay thế dần các công việc yêu cầu quyết định dựa trên quy tắc. "Đội quân thất nghiệp dự bị" có thể mở rộng.</p>
+          </div>
+          <div class="lesson-card info">
+            <h4>💡 Cần Chính Sách</h4>
+            <p>Reskilling & tái huấn luyện lao động là ưu tiên. Xã hội phải chuẩn bị cho sự thay đổi công việc, không phải thất nghiệp.</p>
+          </div>
+        `;
+
+        conclusionText.innerHTML = `
+          <strong>Kết luận:</strong> Khi AI thắng, nó cho thấy khả năng thay thế lao động. Giáo dục, kỹ năng mới (sáng tạo, quản lý nhân sự) sẽ là "vũ khí" của lao động nhân sự trong tương lai.
+        `;
+      } else if (winner === "human") {
+        winnerText.innerHTML = `👤 Con Người Thắng (${humanRate.toFixed(1)}% vs ${aiRate.toFixed(1)}%)`;
+        winnerText.className = "winner-text human";
+
+        lessonsContainer.innerHTML = `
+          <div class="lesson-card key">
+            <h4>✅ Phán Đoán Có Giá Trị</h4>
+            <p>Con người nắm bắt được các yếu tố không được định lượng: khả năng thích ứng, lòng kiên trì, kỹ năng mềm.</p>
+          </div>
+          <div class="lesson-card key">
+            <h4>🛡️ Hy Vọng cho Lao Động</h4>
+            <p>Không phải tất cả công việc sẽ bị thay thế. Những vai trò yêu cầu judgment sẽ giữ lại giá trị con người.</p>
+          </div>
+          <div class="lesson-card info">
+            <h4>🔄 Bổ Sung Không Thay Thế</h4>
+            <p>AI là công cụ hỗ trợ, không phải thay thế. Sự kết hợp (human-AI) hiệu quả hơn cả hai riêng lẻ.</p>
+          </div>
+          <div class="lesson-card warning">
+            <h4>📈 Cần Tái Định Hướng</h4>
+            <p>Công việc sẽ thay đổi, không biến mất. Lao động phải học những kỹ năng bổ sung cho AI (sáng tạo, lãnh đạo, đạo đức).</p>
+          </div>
+        `;
+
+        conclusionText.innerHTML = `
+          <strong>Kết luận:</strong> Con người có thể cạnh tranh với AI bằng cách phát triển những kỹ năng mà AI chưa thể làm tốt. CMCN 4.0 không phải là "thảm họa tuyệt đối" nếu xã hội sẵn sàng thích ứng.
+        `;
+      } else {
+        winnerText.innerHTML = `⚖️ Hòa Nhau (${aiRate.toFixed(1)}% AI vs ${humanRate.toFixed(1)}% Người)`;
+        winnerText.className = "winner-text draw";
+
+        lessonsContainer.innerHTML = `
+          <div class="lesson-card key">
+            <h4>✅ Tương Bổ Sung</h4>
+            <p>Kết quả gần nhau cho thấy AI và con người có sức mạnh khác nhau, bổ sung cho nhau trong quyết định tuyển dụng.</p>
+          </div>
+          <div class="lesson-card warning">
+            <h4>⚠️ Cân Bằng Nguy Hiểm</h4>
+            <p>AI có thể dần thay thế trong tương lai khi công nghệ cải tiến. "Đội quân thất nghiệp dự bị" có thể lớn lên từ từ.</p>
+          </div>
+          <div class="lesson-card info">
+            <h4>💼 Hybrid Model</h4>
+            <p>Tương lai không phải AI hay Con người, mà là Con người + AI. Quyết định cuối cùng nên do con người đưa ra.</p>
+          </div>
+          <div class="lesson-card key">
+            <h4>🎓 Reskilling Cấp Bách</h4>
+            <p>Con người cần học kỹ năng mà AI không thể thay thế: tính sáng tạo, lãnh đạo, cảm thông, đạo đức.</p>
+          </div>
+        `;
+
+        conclusionText.innerHTML = `
+          <strong>Kết luận:</strong> Hybrid model là tương lai. CMCN 4.0 không tự động tạo thất nghiệp; nó thay đổi bản chất công việc. Giáo dục và chính sách dự phòng là chìa khóa.
+        `;
       }
     }
 
